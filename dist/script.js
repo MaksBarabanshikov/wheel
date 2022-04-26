@@ -1,41 +1,5 @@
 "use strict";
-let wheelSegments = [
-    {
-        id: 1,
-        amount: 1,
-        text: "1",
-        color: 'red',
-        hide: true
-    },
-    {
-        id: 2,
-        amount: 1,
-        text: "2",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 3,
-        amount: 1,
-        text: "3",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 4,
-        amount: 1,
-        text: "4",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 5,
-        amount: 1,
-        text: "5",
-        color: 'red',
-        hide: false
-    },
-];
+let wheelSegments = [];
 let wheelSegmentItems;
 const wheelTabs = () => {
     const tabs = document.querySelectorAll('.side__tab'), tabsBody = document.querySelectorAll('.side__body');
@@ -62,8 +26,31 @@ const wheelTabs = () => {
         });
     }
 };
+const wheelHeadIcons = () => {
+    const wheelList = document.querySelector('#wheelList'), wheelShuffle = document.querySelector('#wheelShuffle'), wheelSort = document.querySelector('#wheelSort'), wheelTrash = document.querySelector('#wheelTrash');
+    wheelShuffle.addEventListener('click', () => {
+        wheelSegments.sort(() => Math.random() - 0.5);
+        wheelCreateSegments();
+    });
+    wheelSort.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target.classList.contains('sorted')) {
+            wheelSegments.sort((a, b) => a.text > b.text ? -1 : 1);
+            target.classList.remove('sorted');
+        }
+        else {
+            wheelSegments.sort((a, b) => a.text > b.text ? 1 : -1);
+            target.classList.add('sorted');
+        }
+        wheelCreateSegments();
+    });
+    wheelTrash.addEventListener('click', () => {
+        wheelSegments.length = 0;
+        wheelCreateSegments();
+        console.log(wheelSegments);
+    });
+};
 const wheelCreateSegments = () => {
-    console.log('true');
     const wheelEntries = document.querySelector('#wheelEntries');
     const wheelSegmentHtml = (item, index) => {
         return `
@@ -109,7 +96,6 @@ const wheelCreateSegments = () => {
         btn.addEventListener('click', () => {
             wheelSegments.splice(index, 1);
             wheelCreateSegments();
-            console.log(wheelSegments);
         });
     });
     wheelEntries.querySelectorAll('input')
@@ -127,10 +113,14 @@ const wheelAddSegment = () => {
                 text: headInput.value,
                 hide: false
             }];
+        headInput.value = '';
+        headAmount.value = "1";
+        headInput.focus();
         wheelCreateSegments();
     });
 };
 wheelCreateSegments();
 wheelTabs();
+wheelHeadIcons();
 wheelAddSegment();
 //# sourceMappingURL=script.js.map

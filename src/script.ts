@@ -6,43 +6,7 @@ interface ISegment {
     hide: boolean
 }
 
-let wheelSegments: ISegment[] = [
-    {
-        id: 1,
-        amount: 1,
-        text: "1",
-        color: 'red',
-        hide: true
-    },
-    {
-        id: 2,
-        amount: 1,
-        text: "2",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 3,
-        amount: 1,
-        text: "3",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 4,
-        amount: 1,
-        text: "4",
-        color: 'red',
-        hide: false
-    },
-    {
-        id: 5,
-        amount: 1,
-        text: "5",
-        color: 'red',
-        hide: false
-    },
-]
+let wheelSegments: ISegment[] = []
 
 let wheelSegmentItems: NodeListOf<Element>
 
@@ -78,8 +42,40 @@ const wheelTabs = (): void => {
     }
 }
 
+const wheelHeadIcons = (): void => {
+    const wheelList = document.querySelector<HTMLElement>('#wheelList')!,
+        wheelShuffle = document.querySelector<HTMLElement>('#wheelShuffle')!,
+        wheelSort = document.querySelector<HTMLElement>('#wheelSort')!,
+        wheelTrash = document.querySelector<HTMLElement>('#wheelTrash')!
+
+    wheelShuffle.addEventListener('click',(): void => {
+        wheelSegments.sort(() => Math.random() - 0.5)
+        wheelCreateSegments()
+    })
+
+    wheelSort.addEventListener('click', (event: Event ): void => {
+        const target = event.target as Element
+
+        if (target.classList.contains('sorted')) {
+            wheelSegments.sort((a: ISegment, b:ISegment) => a.text > b.text? -1 : 1)
+            target.classList.remove('sorted')
+        } else {
+            wheelSegments.sort((a: ISegment, b:ISegment) => a.text > b.text? 1 : -1)
+            target.classList.add('sorted')
+        }
+
+
+        wheelCreateSegments()
+    })
+
+    wheelTrash.addEventListener('click', () => {
+        wheelSegments.length = 0
+        wheelCreateSegments()
+        console.log(wheelSegments)
+    })
+}
+
 const wheelCreateSegments = (): void => {
-    console.log('true')
     const wheelEntries = document.querySelector<HTMLElement>('#wheelEntries')!
 
     const wheelSegmentHtml = (item: any, index: number): string => {
@@ -140,7 +136,6 @@ const wheelCreateSegments = (): void => {
             btn.addEventListener('click', () => {
                 wheelSegments.splice(index, 1)
                 wheelCreateSegments()
-                console.log(wheelSegments)
             })
         })
 
@@ -163,13 +158,17 @@ const wheelAddSegment = (): void => {
             text: headInput.value,
             hide: false
         }]
+        headInput.value = ''
+        headAmount.value = "1"
 
+        headInput.focus()
         wheelCreateSegments()
     })
 }
 
 wheelCreateSegments()
 wheelTabs()
+wheelHeadIcons()
 wheelAddSegment()
 
 

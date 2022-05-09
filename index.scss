@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  font-family: sans-serif;
 }
 
 i {
@@ -14,168 +15,108 @@ i {
   }
 }
 
-
 .wheel {
+  position: relative;
+  --size: clamp(250px, 40vmin, 700px);
+  --lg-hs: 0 3%;
+  --lg-stop: 50%;
+  display: grid;
+  grid-gap: calc(var(--size) / 20);
+  align-items: center;
+  grid-template-areas:
+    "spinner"
+    "trigger";
+  font-size: calc(var(--size) / 21);
+
+  &.is-spinning {
+    .wheel__list {
+      //анимация вращения
+      transition: transform 1s cubic-bezier(0.1, -0.01, 0, 1);
+    }
+  }
+
+  & > * {
+    grid-area: spinner;
+  }
+
   &__play {
+    background-color: transparent;
     font-size: 30px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #f2f2f2;
     z-index: 80;
+    color: #f2f2f2;
+    border: none;
+    grid-area: trigger;
+    justify-self: center;
   }
 
   &__list {
+    /* добавляем относительное позиционирование */
     position: relative;
-    padding: 0;
-    margin: 1em auto;
-    width: 31em;
+    /* подключаем сетку */
+    display: grid;
+    /* выравниваем всё по центру */
+    align-items: center;
+    /* добавляем элемент в сетку */
+    //grid-template-areas: "spinner";
+    /* устанавливаем размеры */
+    width: 32em;
     height: 32em;
+    background-color: #ccc;
+    /* поворачиваем элемент  */
+    transform: rotate(calc(var(--rotate, 25) * 1deg));
+    /* рисуем круглую обводку, а всё, что не поместится, — будет скрыто за кругом */
     border-radius: 50%;
-    list-style: none;
-    overflow: hidden;
+    padding: 0;
+    margin: 0;
+
 
     .wheel__item {
-      overflow: hidden;
+      /* включаем «гибкую» вёрстку */
+      display: inline-flex;
       position: absolute;
-      top: 0;
-      right: 0;
-      width: 50%;
+      align-items: center;
+      /* задаём отступы от краёв блока */
+      padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 20);
+      /* устанавливаем размеры */
       height: 50%;
-      transform-origin: 0 100%;
+      overflow: hidden;
+      width: 100%;
 
-      &:first-child {
-        -webkit-transform: rotate(0deg) skewY(-60deg);
-        -ms-transform: rotate(0deg) skewY(-60deg);
-        transform: rotate(0deg) skewY(-60deg);
+      /* устанавливаем координаты, относительно которых будем вращать текст */
+      transform-origin: center;
+      /* поворачиваем текст */
+      transform: rotate(var(--rotate));
+      /* запрещаем пользователю выделять мышкой текст на секторах */
+      user-select: none;
+
+      span {
+        display: flex;
+        word-wrap: break-word;
+        align-items: center;
+        width: 50%;
+        height: 50%;
+        padding: 10px;
+        font-size: 40px;
+        font-weight: 700;
+        color: #fff;
+        overflow: hidden;
       }
-
-      &:nth-child(2) {
-        -webkit-transform: rotate(30deg) skewY(-239deg);
-        -ms-transform: rotate(30deg) skewY(-239deg);
-        transform: rotate(30deg) skewY(-239deg);
-      }
-
-      &:nth-child(3) {
-        -webkit-transform: rotate(60deg) skewY(301deg);
-        -ms-transform: rotate(60deg) skewY(301deg);
-        transform: rotate(60deg) skewY(301deg);
-      }
-
-      &:nth-child(4) {
-        -webkit-transform: rotate(90deg) skewY(121deg);
-        -ms-transform: rotate(90deg) skewY(121deg);
-        transform: rotate(90deg) skewY(121deg);
-      }
-
-      &:nth-child(5) {
-        -webkit-transform: rotate(120deg) skewY(-239deg);
-        -ms-transform: rotate(120deg) skewY(-239deg);
-        transform: rotate(120deg) skewY(-239deg);
-      }
-
-      &:nth-child(6) {
-        -webkit-transform: rotate(150deg) skewY(-60deg);
-        -ms-transform: rotate(150deg) skewY(-60deg);
-        transform: rotate(150deg) skewY(-60deg);
-      }
-
-      &:nth-child(7) {
-        -webkit-transform: rotate(180deg) skewY(-60deg);
-        -ms-transform: rotate(180deg) skewY(-60deg);
-        transform: rotate(180deg) skewY(-60deg);
-      }
-
-      &:nth-child(8) {
-        -webkit-transform: rotate(210deg) skewY(-239deg);
-        -ms-transform: rotate(210deg) skewY(-239deg);
-        transform: rotate(210deg) skewY(-239deg);
-      }
-
-      &:nth-child(9) {
-        -webkit-transform: rotate(240deg) skewY(-59deg);
-        -ms-transform: rotate(240deg) skewY(-59deg);
-        transform: rotate(240deg) skewY(-59deg);
-      }
-
-      &:nth-child(10) {
-        -webkit-transform: rotate(270deg) skewY(-60deg);
-        -ms-transform: rotate(270deg) skewY(-60deg);
-        transform: rotate(270deg) skewY(301deg);
-      }
-
-      &:nth-child(11) {
-        -webkit-transform: rotate(300deg) skewY(120deg);
-        -ms-transform: rotate(300deg) skewY(120deg);
-        transform: rotate(300deg) skewY(120deg);
-      }
-
-      &:nth-child(12) {
-        -webkit-transform: rotate(330deg) skewY(-60deg);
-        -ms-transform: rotate(330deg) skewY(-60deg);
-        transform: rotate(330deg) skewY(-60deg);
-      }
-
-      &:first-child .wheel__section {
-        background: #faa347;
-      }
-
-      &:nth-child(2) .wheel__section {
-        background: #f8c453;
-      }
-
-      &:nth-child(3) .wheel__section {
-        background: #f9e868;
-      }
-
-      &:nth-child(4) .wheel__section {
-        background: #cfdb65;
-      }
-
-      &:nth-child(5) .wheel__section {
-        background: #98c56c;
-      }
-
-      &:nth-child(6) .wheel__section {
-        background: #60b468;
-      }
-
-      &:nth-child(7) .wheel__section {
-        background: #3ca195;
-      }
-
-      &:nth-child(8) .wheel__section {
-        background: #3dc0d4;
-      }
-
-      &:nth-child(9) .wheel__section {
-        background: #40b0ec;
-      }
-
-      &:nth-child(10) .wheel__section {
-        background: #4ba2eb;
-      }
-
-      &:nth-child(11) .wheel__section {
-        background: #7b55b9;
-      }
-
-      &:nth-child(12) .wheel__section {
-        background: #a643b3;
-      }
-
     }
 
   }
 
   &__border {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
     border: 15px solid rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     z-index: 20;
+    top: 0;
   }
 
   &__circle {
@@ -202,27 +143,6 @@ i {
       z-index: 1;
       -webkit-tap-highlight-color: transparent;
     }
-  }
-
-  &__section {
-    position: absolute;
-    left: -100%;
-    width: 200%;
-    height: 200%;
-    text-align: center;
-    -webkit-transform: skewY(60deg) rotate(15deg);
-    -ms-transform: skewY(60deg) rotate(15deg);
-    transform: skewY(60deg) rotate(15deg);
-    padding: 20px;
-  }
-
-  &__text {
-    font-family: sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
-    display: inline-block;
-    transform: rotate(90deg) translateX(50%);
   }
 }
 
@@ -373,6 +293,7 @@ i {
 
   &__buttons {
     display: flex;
+    justify-content: space-between;
     padding-left: 5px;
     width: 64px;
     max-width: 64px;
@@ -407,6 +328,23 @@ i {
       .side__text {
         max-width: 100%;
         width: 99%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        .side__inc {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          height: 50%;
+          width: 35px;
+          font-size: 11px;
+          padding: 3px 5px;
+          background-color: green;
+          border-radius: 20px;
+          border: 1px;
+        }
       }
 
       .side__number {
@@ -420,6 +358,179 @@ i {
   }
 }
 
+.wheel-modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  top: 0;
+  left: 0;
+  z-index: -100;
+  opacity: 0;
+  visibility: hidden;
+
+  &_open {
+    z-index: 1000;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__body {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 10px;
+  }
+
+  &__content {
+    background-color: #fff;
+    color: #000;
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    max-width: 100%;
+    align-self: center;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    height: 40rem;
+    width: 45rem;
+    justify-content: center;
+    padding: 2rem 5rem;
+    border-radius: 0.5rem;
+  }
+
+  &__win {
+    color: #000000;
+    font-size: 5vw;
+  }
+
+  &__input {
+    border: 3px solid #d3d3d3;
+    flex: 1 1 0;
+    overflow: auto;
+    padding: 1rem;
+    font-weight: 500;
+    width: 100%;
+    margin-bottom: 2rem;
+
+    &-editable {
+      flex: 1 0 20rem;
+      outline: none;
+      cursor: text;
+      height: 100%;
+
+      &:empty:before {
+        content: attr(aria-placeholder);
+        display: block;
+        color: #d3d3d3;
+        font-size: 20px;
+        width: 100%;
+      }
+    }
+
+    &-readonly {
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 2px dashed #d3d3d3;
+    }
+  }
+
+  &__buttons {
+    display: grid;
+    width: 100%;
+    grid-template-rows: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  &__button {
+    cursor: pointer;
+    display: inline-block;
+    background-color: rgb(208, 2, 27);
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 3px;
+    padding: 1rem 0;
+    font-weight: 700;
+    font-size: 20px;
+    transition: 0.2s ease-in-out;
+
+    &_add {
+      background-color: rgb(247, 183, 29);
+    }
+
+    &_ok {
+      background-color: #2d76f5;
+    }
+
+    &_hide {
+      background-color: rgb(247, 183, 29);
+    }
+
+    &_remove {
+      background-color: rgb(208, 2, 27);
+    }
+
+    &_inc {
+      background-color: green;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &[id='wheelModalWin'] {
+    .wheel-modal__content {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      height: 30rem;
+    }
+
+    .wheel-modal__buttons {
+      grid-template-rows: 100%;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 30px;
+    }
+  }
+}
+
+/* анимируем выпавший сектор */
+.wheel__item.selected span {
+  /* делаем текст белым */
+  color: white;
+  /* настраиваем длительность анимации */
+  animation: selected 800ms ease;
+}
+
+/* настраиваем анимацию текста на выпавшем секторе по кадрам */
+@keyframes selected {
+  /* что происходит на 25% от начала анимации */
+  25% {
+    /* увеличиваем текст в 1,25 раза */
+    transform: scale(1.25);
+    /* добавляем тексту тень */
+    text-shadow: 1vmin 1vmin 0 hsla(0 0% 0% / 0.1);
+  }
+  40% {
+    transform: scale(0.92);
+    text-shadow: 0 0 0 hsla(0 0% 0% / 0.2);
+  }
+  60% {
+    transform: scale(1.02);
+    text-shadow: 0.5vmin 0.5vmin 0 hsla(0 0% 0% / 0.1);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+  85% {
+    transform: scale(1);
+  }
+}
 
 .hide {
   display: none !important;

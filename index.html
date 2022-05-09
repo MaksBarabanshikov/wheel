@@ -14,49 +14,13 @@
 <div class="app__main">
     <div class="app__container">
         <div class="app__wheel wheel">
-            <ul class="wheel__list">
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">1</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">2</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Taco</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Stew</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Soup</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Steak</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Chinese</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">BBQ</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Pasta</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Hot dog</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Satad</span></div>
-                </li>
-                <li class="wheel__item">
-                    <div class="wheel__section"><span class="wheel__text">Grill</span></div>
-                </li>
-
-                <div class="wheel__border"></div>
-                <i class="wheel__play fas fa-play"></i>
-                <div class="wheel__circle">
-                </div>
-            </ul>
+            <ul class="wheel__list"></ul>
+            <div class="wheel__circle">
+                <button class="wheel__play">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            <div class="wheel__border"></div>
         </div>
         <div class="app__side side">
             <div class="side__tabs">
@@ -74,7 +38,7 @@
                         >
                             Results
                         </a>
-                        <div class="side__counter">5</div>
+                        <div class="side__counter"></div>
                     </div>
                 </div>
                 <div class="side__icons">
@@ -91,138 +55,35 @@
                     <input id="wheelMainInput" class="side__input" type="text" placeholder="Input text here..."/>
                     <button id="wheelAddSegment" class="side__btn">Ok</button>
                 </div>
-                <div id="wheelEntries" class="side__body tab-entries side__body_active">
+                <div id="wheelEntries" class="side__body side__body_active tab-entries"></div>
+                <div class="side__body tab-results"></div>
+            </div>
+        </div>
+        <div id="wheelModal" class="app__wheel-modal wheel-modal">
+            <div class="wheel-modal__body">
+                <div class="wheel-modal__content">
+                    <div class="wheel-modal__input">
+                        <div class="wheel-modal__input-editable" aria-placeholder="Введите/Вставьте свои новые поля"
+                             contenteditable="true"></div>
+                    </div>
+                    <div class="wheel-modal__buttons">
+                        <button class="wheel-modal__button wheel-modal__button_cansel wheel-modal_close">Отмена</button>
+                        <button class="wheel-modal__button wheel-modal__button_add wheel-modal_close">Добавить</button>
+                    </div>
                 </div>
-                <div class="side__body tab-results">
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
+            </div>
+        </div>
+        <div id="wheelModalWin" class="app__wheel-modal wheel-modal">
+            <div class="wheel-modal__body">
+                <div class="wheel-modal__content">
+                    <div class="wheel-modal__win">
+                        <h3 class="wheel-modal__title"></h3>
                     </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side__item">
-                        <div class="side__number">1</div>
-                        <div class="side__text">1</div>
-                        <div class="side__buttons">
-                            <div class="side__hide">
-                                <i class="fas fa-eye fa-lg"></i>
-                                <i class="fas fa-eye-slash hide fa-lg"></i>
-                            </div>
-                            <div class="side__delete">
-                                <i class="fas fa-times fa-lg"></i>
-                            </div>
-                        </div>
+                    <div class="wheel-modal__buttons">
+                        <button class="wheel-modal__button wheel-modal__button_ok wheel-modal_close">OK</button>
+                        <button class="wheel-modal__button wheel-modal__button_hide wheel-modal_close">Hide</button>
+                        <button class="wheel-modal__button wheel-modal__button_remove wheel-modal_close">Remove</button>
+                        <button class="wheel-modal__button wheel-modal__button_inc wheel-modal_close">+1</button>
                     </div>
                 </div>
             </div>
@@ -231,3 +92,4 @@
 </div>
 </body>
 </html>
+

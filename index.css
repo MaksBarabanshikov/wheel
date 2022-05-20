@@ -154,7 +154,7 @@ i {
   text-decoration: none;
   color: #3e96fb;
 }
-.side__tabs .side__tab:not(.active-tabs):hover {
+.side__tabs .side__tab:not(.side__tabs .side__tab_active):hover {
   text-decoration: underline;
 }
 .side__tabs .side__tab_active {

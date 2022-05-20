@@ -178,7 +178,7 @@ i {
       text-decoration: none;
       color: #3e96fb;
 
-      &:not(.active-tabs):hover {
+      &:not(&_active):hover {
         text-decoration: underline;
       }
 

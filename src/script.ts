@@ -1,7 +1,7 @@
 //=============interface==============
 
 interface ISegment {
-    id?: number,
+    id: string,
     amount?: number,
     text: string,
     color?: string
@@ -9,7 +9,7 @@ interface ISegment {
 }
 
 interface IResult {
-    id: number
+    id: string
     text: string
     value: number
     inc: boolean
@@ -47,26 +47,57 @@ let trigger = document.querySelector<HTMLButtonElement>('.wheel__play')!
 const wheelList = document.querySelector<HTMLElement>('.wheel__list')!
 const plug: ISegment[] = [
     {
+        id: uniqueId(),
         text: "1",
         hide: false
     },
     {
+        id: uniqueId(),
         text: "2",
         hide: false
     },
     {
+        id: uniqueId(),
         text: "3",
         hide: false
     },
     {
+        id: uniqueId(),
         text: "4",
         hide: false
     },
     {
+        id: uniqueId(),
         text: "5",
         hide: false
     },
+    {
+        id: uniqueId(),
+        text: "6",
+        hide: false
+    },
+    {
+        id: uniqueId(),
+        text: "7",
+        hide: false
+    },
+    {
+        id: uniqueId(),
+        text: "8",
+        hide: false
+    },
+    {
+        id: uniqueId(),
+        text: "9",
+        hide: false
+    },
+    {
+        id: uniqueId(),
+        text: "10",
+        hide: false
+    },
 ]
+let notHide: ISegment[] = []
 
 // на сколько секторов нарезаем круг
 
@@ -85,6 +116,10 @@ let rotation = 0
 // переменная для текстовых подписей
 
 let prizeNodes: NodeListOf<Element>
+
+function uniqueId(): string {
+    return Math.random().toString(16).slice(2)
+} // unique value for wheel segment
 
 //=============side==============
 
@@ -130,8 +165,8 @@ const wheelHeadIcons = (): void => {
         wheelShuffle = document.querySelector<HTMLElement>('#wheelShuffle')!,
         wheelSort = document.querySelector<HTMLElement>('#wheelSort')!,
         wheelTrash = document.querySelector<HTMLElement>('#wheelTrash')!
-
-    wheelList.addEventListener('click', wheelModal, true)
+    const side = document.querySelector<HTMLElement>('.side')!
+    wheelList.addEventListener('click', wheelModal)
 
     wheelShuffle.addEventListener('click', (): void => {
         wheelSegments.sort(() => Math.random() - 0.5)
@@ -141,24 +176,44 @@ const wheelHeadIcons = (): void => {
 
     wheelSort.addEventListener('click', (event: Event): void => {
         const target = event.target as Element
+        const selectedTabResult = side.classList.contains('side_result')
 
-        if (target.classList.contains('sorted')) {
-            wheelSegments.sort((a: ISegment, b: ISegment) => a.text > b.text ? -1 : 1)
-            target.classList.remove('sorted')
-        } else {
-            wheelSegments.sort((a: ISegment, b: ISegment) => a.text > b.text ? 1 : -1)
-            target.classList.add('sorted')
+        function sort(elem: ISegment[] | IResult[]) {
+            if (target.classList.contains('sorted')) {
+                elem.sort((a: ISegment | IResult, b: ISegment | IResult) => a.text > b.text ? -1 : 1)
+                target.classList.remove('sorted')
+            } else {
+                elem.sort((a: ISegment | IResult, b: ISegment | IResult) => a.text > b.text ? 1 : -1)
+                target.classList.add('sorted')
+            }
         }
 
-
-        wheelCreateSegments()
-        setupWheel()
+        if (selectedTabResult) {
+            sort(wheelResults)
+        } else {
+            sort(wheelSegments)
+            wheelCreateSegments()
+            setupWheel()
+        }
     })
 
     wheelTrash.addEventListener('click', (): void => {
-        wheelSegments.length = 0
-        wheelCreateSegments()
-        setupWheel()
+        const selectedTabResult = side.classList.contains('side_result')
+
+        function clearList(elem: ISegment[] | IResult[]) {
+            elem.length = 0
+        }
+
+        if (selectedTabResult) {
+            const bodyResults: Element = document.querySelector<HTMLDivElement>('.tab-results')!
+            clearList(wheelResults)
+            bodyResults.innerHTML = 'Пусто'
+            wheelResultCounter()
+        } else {
+            clearList(wheelSegments)
+            wheelCreateSegments()
+            setupWheel()
+        }
     })
 }
 
@@ -194,6 +249,7 @@ const wheelCreateSegments = (): void => {
         this.className === 'side__number' ?
             wheelSegments[<any>this.name].amount = parseInt(this.value) :
             wheelSegments[<any>this.name].text = this.value
+        setupWheel()
     }
 
     // hide segment
@@ -243,6 +299,7 @@ const wheelAddSegment = (): void => {
     function addSegment() {
         if (headInput.value) {
             wheelSegments = [...wheelSegments, {
+                id: uniqueId(),
                 amount: parseInt(headAmount.value),
                 text: headInput.value,
                 hide: false
@@ -272,18 +329,21 @@ const wheelResultCounter = (): void => {
     let resultsCounter = document.querySelector<HTMLDivElement>('.side__counter')!
 
     resultsCounter.innerHTML = wheelResults.length.toString()
+
+    if (wheelResults.length) {
+        resultsCounter.style.display = "block"
+    } else {
+        resultsCounter.style.display = "none"
+    }
 }
 
-const createResultsItem = (): void => {
-
-    const bodyResults: Element = document.querySelector<HTMLDivElement>('.tab-results')!
-
-    bodyResults.innerHTML = ''
-
-    const resultHtml = (item: IResult): string | null => {
-
+const addSelectResult = (result?: IResult): void => {
+    console.log("win",result)
+    const body = document.querySelector<HTMLElement>('.tab-results')!
+    let check: boolean = true
+    const resultHtml = (item: IResult): string => {
         if (item.inc) {
-                return `<div class="side__item">
+            return `<div class="side__item">
                             <div class="side__text">
                                 ${item.text}
                                 <span id="wheelResult_${item.id}" class="side__inc">
@@ -292,39 +352,45 @@ const createResultsItem = (): void => {
                             </div>
                          </div>
         `
-            }
+        }
         return `<div class="side__item">
                             <div class="side__text">
                                 ${item.text}
                             </div>
                          </div>
         `
+    }
+    const resultUpdateHtml = (): void => {
+        body.innerHTML = ''
+        if (wheelResults.length) {
+            wheelResults.map((item:IResult) => {
+                body.innerHTML += resultHtml(item)
+            })
+        } else if (wheelResults.length === 0){
+            console.log("пусто")
+            body.innerHTML = 'Пусто'
+        }
 
     }
-
-    wheelResults.map((item: IResult) => {
-        bodyResults.innerHTML += resultHtml(item)
-    })
-
-    console.log("результат",wheelResults)
-}
-
-const addSelectResult = (result: IResult): void => {
-    const counter = document.querySelector(`#wheelResult_${result.id}`)
-    console.log('select:', result)
-    if (counter && result.inc) {
-        console.log('counter && result.inc:', counter && result.inc)
-        wheelResults.map(item => {
-            if (item.id === result.id) {
-                ++item.value
-                counter.innerHTML = `+ ${item.value}`
+    if (result) {
+        if (wheelResults.length) {
+            wheelResults.map(item => {
+                if ((item.id === result?.id) && (item.inc && result.inc)) {
+                    console.log("if ",item)
+                    item.value++
+                    check = false
+                }
+            })
+            if (check) {
+                console.log(check)
+                wheelResults = [...wheelResults, result]
             }
-        })
-    } else {
-        wheelResults = [...wheelResults, result]
-        createResultsItem()
-        wheelResultCounter()
+        } else {
+            wheelResults = [...wheelResults, result]
+        }
     }
+    wheelResultCounter()
+    resultUpdateHtml()
 }
 
 //===============btnHandler===========
@@ -390,6 +456,7 @@ const wheelModal = (): void => {
             if (item.textContent) {
                 if (item.textContent)
                     wheelSegments = [...wheelSegments, {
+                        id: uniqueId(),
                         amount: 1,
                         text: item.textContent,
                         hide: false
@@ -402,7 +469,7 @@ const wheelModal = (): void => {
     })
 }
 
-const winModal = (win: ISegment, selected: number): void => {
+const winModal = (win: ISegment, selected: number, winText: string): void => {
     const modal = document.querySelector<HTMLDivElement>('#wheelModalWin')!,
         modalCloseButton = document.querySelectorAll<HTMLButtonElement>('.wheel-modal_close')!,
         text = modal.querySelector<HTMLHeadElement>('.wheel-modal__title')!,
@@ -411,16 +478,10 @@ const winModal = (win: ISegment, selected: number): void => {
         btnHide = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_hide')!,
         btnInc = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_inc')!
 
-    let result: IResult = {
-        id: selected,
-        text: prizeNodes[selected].textContent!,
-        value: 1,
-        inc: false
-    }
-
+    console.log(win.id, win.text)
     modalOpen(modal)
 
-    text.innerHTML = prizeNodes[selected].textContent!
+    text.innerHTML = winText
 
     if (modalCloseButton.length > 0) {
         modalCloseButton.forEach(btn => {
@@ -431,16 +492,25 @@ const winModal = (win: ISegment, selected: number): void => {
     }
 
     function addHandler() {
-        console.log('add:', result)
+        const result: IResult = {
+            id: win.id,
+            text: winText,
+            value: 1,
+            inc: false
+        }
+
         addSelectResult(result)
-        wheelCreateSegments()
-        setupWheel()
         removeListener()
     }
 
     function hideHandler() {
+        const result: IResult = {
+            id: win.id,
+            text: winText,
+            value: 1,
+            inc: false
+        }
         addSelectResult(result)
-        console.log(win)
         win.hide = true
         wheelCreateSegments()
         setupWheel()
@@ -448,6 +518,12 @@ const winModal = (win: ISegment, selected: number): void => {
     }
 
     function removeHandler() {
+        const result: IResult = {
+            id: win.id,
+            text: winText,
+            value: 1,
+            inc: false
+        }
         addSelectResult(result)
         wheelSegments = wheelSegments.filter(segment => !(segment === win))
         wheelCreateSegments()
@@ -456,13 +532,16 @@ const winModal = (win: ISegment, selected: number): void => {
     }
 
     function incHandler() {
-        console.log("click")
-        console.log(result)
-        result.inc = true
+        const result: IResult = {
+            id: win.id,
+            text: winText,
+            value: 1,
+            inc: true
+        }
         addSelectResult(result)
         removeListener()
     }
-    
+
     function removeListener() {
         btnAdd.removeEventListener('click', addHandler)
         btnRemove.removeEventListener('click', removeHandler)
@@ -524,12 +603,15 @@ const selectSegment = (): void => {
     curSegment > 360 ? curSegment %= 360 : null
     const selected = Math.floor(curSegment / segmentSlice)
     prizeNodes[selected].classList.add(selectedClass)
-    winModal(wheelSegments[selected], selected)
-    console.log('win',wheelSegments[selected], prizeNodes[selected])
+    winModal(
+        notHide[selected],
+        selected,
+        prizeNodes[selected].textContent!.replace(/\s+/g, ' ').trim()
+    )
 }
 
 const setupWheel = (): void => {
-    const notHide = wheelSegments.filter(segment => !segment.hide)
+    notHide = wheelSegments.filter(segment => !segment.hide)
     if (!notHide.length) {
         segmentNotHide = plug.filter(segment => !segment.hide)
         segmentSlice = 360 / segmentNotHide.length;
@@ -537,6 +619,7 @@ const setupWheel = (): void => {
         segmentNotHide = wheelSegments.filter(segment => !segment.hide)
         segmentSlice = 360 / segmentNotHide.length;
     }
+    console.log(notHide)
     wheelCreateSegmentsColor()
     wheelCreateSegmentsNodes()
 
@@ -557,6 +640,8 @@ trigger.addEventListener('click', () => {
     // через CSS говорим секторам, как им повернуться
     wheelList.style.setProperty("--rotate", rotation.toString())
 })
+
+// отслеживаем остановку колеса
 wheelList.addEventListener('transitionend', () => {
     rotation %= 360
 

@@ -336,6 +336,8 @@ const wheelSegmentCounter = (): void => {
     } else {
         counter.style.display = "none"
     }
+
+    wheelAddColors()
 }
 
 // =================result===============
@@ -611,6 +613,13 @@ const wheelCreateSegmentsNodes = (): void => {
     })
 }
 
+const wheelAddColors = (): void => {
+    if (wheelSegments.length && wheelSegments.length % 16 === 0) {
+        colors.push(...colors)
+    }
+}
+wheelAddColors()
+
 const wheelCreateSegmentsColor = (): void => {
     // устанавливаем нужное значение стиля у элемента spinner
     wheelList.setAttribute(
@@ -618,8 +627,9 @@ const wheelCreateSegmentsColor = (): void => {
         `background: repeating-conic-gradient(
       from -90deg,
       ${
-            colors.map((color, i) => `${color} 0 ${(100 / segmentNotHide.length) * (segmentNotHide.length - i)}%`)
-                .reverse()
+            colors.map((color, i) => {
+                return `${color} 0 ${(100 / segmentNotHide.length) * (segmentNotHide.length - i)}%`
+            } ).reverse()
         }
     );`
     );

@@ -211,6 +211,7 @@ const wheelHeadIcons = (): void => {
             wheelResultCounter()
         } else {
             clearList(wheelSegments)
+            wheelSegmentCounter()
             wheelCreateSegments()
             setupWheel()
         }
@@ -278,6 +279,7 @@ const wheelCreateSegments = (): void => {
         .forEach((btn, index: number) => {
             btn.addEventListener('click', () => {
                 wheelSegments.splice(index, 1)
+                wheelSegmentCounter()
                 setupWheel()
                 wheelCreateSegments()
             })
@@ -287,7 +289,7 @@ const wheelCreateSegments = (): void => {
 
     wheelEntries.querySelectorAll('input')!
         .forEach(item => {
-            item.addEventListener('change', editArr, true)
+            item.addEventListener('input', editArr, true)
         })
 }
 
@@ -308,6 +310,7 @@ const wheelAddSegment = (): void => {
             headAmount.value = "1"
 
             headInput.focus()
+            wheelSegmentCounter()
             wheelCreateSegments()
             setupWheel()
         }
@@ -321,6 +324,18 @@ const wheelAddSegment = (): void => {
 
     btn.addEventListener('click', addSegment)
     headInput.addEventListener('keyup', keyUpAdd)
+}
+
+const wheelSegmentCounter = (): void => {
+    let counter = document.querySelector<HTMLDivElement>('.side__entries_counter')!
+
+    counter.innerHTML = wheelSegments.length.toString()
+
+    if (wheelSegments.length) {
+        counter.style.display = "block"
+    } else {
+        counter.style.display = "none"
+    }
 }
 
 // =================result===============
@@ -423,11 +438,12 @@ const wheelModal = (): void => {
     const modalAddBtn = document.querySelector<HTMLButtonElement>('.wheel-modal__button_add')!
     let modalInput = document.querySelector<HTMLElement>('.wheel-modal__input')!
     let modalInputEdit = document.querySelector<HTMLElement>('.wheel-modal__input-editable')!
+    let modalInputReadonly = document.querySelector<HTMLElement>('.wheel-modal__input-readonly')
+    let arr:ISegment[] = [...wheelSegments]
 
     modalOpen(modal)
 
     if (wheelSegments.length > 0) {
-        let modalInputReadonly = document.querySelector<HTMLElement>('.wheel-modal__input-readonly')
         if (modalInputReadonly === null) {
             const div = document.createElement('div')
             div.className = 'wheel-modal__input-readonly'
@@ -436,6 +452,20 @@ const wheelModal = (): void => {
                 div.innerHTML += wheelCreateHTML(item)
             })
             modalInput.insertBefore(div, modalInputEdit)
+            const inputs = div.querySelectorAll<HTMLInputElement>('.wheel-modal__input_item')
+
+            function newTextSegment(segment: ISegment, input: HTMLInputElement) {
+                segment.text = input.value
+                modalAddBtn.removeEventListener('click', newTextSegment.bind)
+            }
+            inputs.forEach(input => {
+                arr.map(segment => {
+                    if (segment.id === input.id) {
+                        input.addEventListener('input', newTextSegment.bind(null ,segment, input))
+                    }
+                })
+
+            })
         }
     }
 
@@ -447,26 +477,29 @@ const wheelModal = (): void => {
 
     function wheelCreateHTML(item: any): string {
         return `
-            <div>${item.text}</div> 
+            <input class="wheel-modal__input_item" id="${item.id}" type="text" value="${item.text}"/> 
         `
     }
 
-    modalAddBtn.addEventListener('click', () => {
+    function addElements() {
+        let arr:ISegment[] = []
         modalInputEdit.childNodes.forEach(item => {
             if (item.textContent) {
-                if (item.textContent)
-                    wheelSegments = [...wheelSegments, {
-                        id: uniqueId(),
-                        amount: 1,
-                        text: item.textContent,
-                        hide: false
-                    }]
+                wheelSegments = [...wheelSegments, {
+                    id: uniqueId(),
+                    amount: 1,
+                    text: item.textContent,
+                    hide: false
+                }]
             }
         })
         modalInputEdit.innerHTML = ""
         wheelCreateSegments()
         setupWheel()
-    })
+        modalAddBtn.removeEventListener('click', addElements)
+    }
+
+    modalAddBtn.addEventListener('click', addElements)
 }
 
 const winModal = (win: ISegment, selected: number, winText: string): void => {
@@ -619,7 +652,6 @@ const setupWheel = (): void => {
         segmentNotHide = wheelSegments.filter(segment => !segment.hide)
         segmentSlice = 360 / segmentNotHide.length;
     }
-    console.log(notHide)
     wheelCreateSegmentsColor()
     wheelCreateSegmentsNodes()
 

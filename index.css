@@ -2,6 +2,7 @@
 * {
   box-sizing: border-box;
   font-family: sans-serif;
+  user-select: none;
 }
 
 i {
@@ -51,7 +52,6 @@ i {
   display: grid;
   /* выравниваем всё по центру */
   align-items: center;
-  /* добавляем элемент в сетку */
   /* устанавливаем размеры */
   width: 32em;
   height: 32em;
@@ -74,6 +74,7 @@ i {
   height: 50%;
   overflow: hidden;
   width: 100%;
+  white-space: pre-wrap;
   /* устанавливаем координаты, относительно которых будем вращать текст */
   transform-origin: center;
   /* поворачиваем текст */
@@ -85,12 +86,13 @@ i {
   display: flex;
   word-wrap: break-word;
   align-items: center;
-  width: 50%;
-  height: 50%;
+  width: 37%;
+  height: 48%;
   padding: 10px;
   font-size: 40px;
   font-weight: 700;
   color: #fff;
+  text-overflow: ellipsis;
   overflow: hidden;
 }
 .wheel__border {
@@ -128,7 +130,7 @@ i {
 }
 
 .side {
-  width: 400px;
+  width: 430px;
   margin-left: 30px;
   border-left: 1px solid #d3d3d3;
   padding-left: 5px;
@@ -159,6 +161,19 @@ i {
 }
 .side__tabs .side__tab_active {
   color: #5e5e5e !important;
+}
+.side__entries {
+  display: flex;
+}
+.side__entries_counter {
+  display: none;
+  width: 25px;
+  height: 25px;
+  padding: 3px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  text-align: center;
+  margin-left: 5px;
 }
 .side__results {
   display: flex;
@@ -371,9 +386,17 @@ i {
   width: 100%;
 }
 .wheel-modal__input-readonly {
+  display: flex;
+  flex-direction: column;
   padding-bottom: 10px;
   margin-bottom: 10px;
   border-bottom: 2px dashed #d3d3d3;
+  outline: none;
+}
+.wheel-modal__input-readonly input {
+  font-size: 16px;
+  border: none;
+  outline: none;
 }
 .wheel-modal__buttons {
   display: grid;

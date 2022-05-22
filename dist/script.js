@@ -158,6 +158,7 @@ const wheelHeadIcons = () => {
         }
         else {
             clearList(wheelSegments);
+            wheelSegmentCounter();
             wheelCreateSegments();
             setupWheel();
         }
@@ -209,13 +210,14 @@ const wheelCreateSegments = () => {
         .forEach((btn, index) => {
         btn.addEventListener('click', () => {
             wheelSegments.splice(index, 1);
+            wheelSegmentCounter();
             setupWheel();
             wheelCreateSegments();
         });
     });
     wheelEntries.querySelectorAll('input')
         .forEach(item => {
-        item.addEventListener('change', editArr, true);
+        item.addEventListener('input', editArr, true);
     });
 };
 const wheelAddSegment = () => {
@@ -233,6 +235,7 @@ const wheelAddSegment = () => {
             headInput.value = '';
             headAmount.value = "1";
             headInput.focus();
+            wheelSegmentCounter();
             wheelCreateSegments();
             setupWheel();
         }
@@ -244,6 +247,16 @@ const wheelAddSegment = () => {
     }
     btn.addEventListener('click', addSegment);
     headInput.addEventListener('keyup', keyUpAdd);
+};
+const wheelSegmentCounter = () => {
+    let counter = document.querySelector('.side__entries_counter');
+    counter.innerHTML = wheelSegments.length.toString();
+    if (wheelSegments.length) {
+        counter.style.display = "block";
+    }
+    else {
+        counter.style.display = "none";
+    }
 };
 const wheelResultCounter = () => {
     let resultsCounter = document.querySelector('.side__counter');
@@ -334,9 +347,10 @@ const wheelModal = () => {
     const modalAddBtn = document.querySelector('.wheel-modal__button_add');
     let modalInput = document.querySelector('.wheel-modal__input');
     let modalInputEdit = document.querySelector('.wheel-modal__input-editable');
+    let modalInputReadonly = document.querySelector('.wheel-modal__input-readonly');
+    let arr = [...wheelSegments];
     modalOpen(modal);
     if (wheelSegments.length > 0) {
-        let modalInputReadonly = document.querySelector('.wheel-modal__input-readonly');
         if (modalInputReadonly === null) {
             const div = document.createElement('div');
             div.className = 'wheel-modal__input-readonly';
@@ -345,6 +359,18 @@ const wheelModal = () => {
                 div.innerHTML += wheelCreateHTML(item);
             });
             modalInput.insertBefore(div, modalInputEdit);
+            const inputs = div.querySelectorAll('.wheel-modal__input_item');
+            function newTextSegment(segment, input) {
+                segment.text = input.value;
+                modalAddBtn.removeEventListener('click', newTextSegment.bind);
+            }
+            inputs.forEach(input => {
+                arr.map(segment => {
+                    if (segment.id === input.id) {
+                        input.addEventListener('input', newTextSegment.bind(null, segment, input));
+                    }
+                });
+            });
         }
     }
     if (modalCloseButton.length > 0) {
@@ -354,25 +380,27 @@ const wheelModal = () => {
     }
     function wheelCreateHTML(item) {
         return `
-            <div>${item.text}</div> 
+            <input class="wheel-modal__input_item" id="${item.id}" type="text" value="${item.text}"/> 
         `;
     }
-    modalAddBtn.addEventListener('click', () => {
+    function addElements() {
+        let arr = [];
         modalInputEdit.childNodes.forEach(item => {
             if (item.textContent) {
-                if (item.textContent)
-                    wheelSegments = [...wheelSegments, {
-                            id: uniqueId(),
-                            amount: 1,
-                            text: item.textContent,
-                            hide: false
-                        }];
+                wheelSegments = [...wheelSegments, {
+                        id: uniqueId(),
+                        amount: 1,
+                        text: item.textContent,
+                        hide: false
+                    }];
             }
         });
         modalInputEdit.innerHTML = "";
         wheelCreateSegments();
         setupWheel();
-    });
+        modalAddBtn.removeEventListener('click', addElements);
+    }
+    modalAddBtn.addEventListener('click', addElements);
 };
 const winModal = (win, selected, winText) => {
     const modal = document.querySelector('#wheelModalWin'), modalCloseButton = document.querySelectorAll('.wheel-modal_close'), text = modal.querySelector('.wheel-modal__title'), btnAdd = modal.querySelector('.wheel-modal__button_ok'), btnRemove = modal.querySelector('.wheel-modal__button_remove'), btnHide = modal.querySelector('.wheel-modal__button_hide'), btnInc = modal.querySelector('.wheel-modal__button_inc');
@@ -485,7 +513,6 @@ const setupWheel = () => {
         segmentNotHide = wheelSegments.filter(segment => !segment.hide);
         segmentSlice = 360 / segmentNotHide.length;
     }
-    console.log(notHide);
     wheelCreateSegmentsColor();
     wheelCreateSegmentsNodes();
     prizeNodes = wheel.querySelectorAll('.wheel__item');

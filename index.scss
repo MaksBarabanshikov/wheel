@@ -13,6 +13,11 @@ i {
     display: flex;
     justify-content: center;
     font-family: sans-serif;
+    flex-direction: row;
+
+    @media (max-width: 992px) {
+      flex-direction: column;
+    }
   }
 }
 
@@ -27,12 +32,11 @@ i {
   grid-template-areas:
     "spinner"
     "trigger";
-  font-size: calc(var(--size) / 21);
 
   &.is-spinning {
     .wheel__list {
       //анимация вращения
-      transition: transform 1s cubic-bezier(0.1, -0.01, 0, 1);
+      transition: transform 7s cubic-bezier(0.1, -0.01, 0, 1);
     }
   }
 
@@ -75,39 +79,66 @@ i {
 
     .wheel__item {
       /* включаем «гибкую» вёрстку */
-      display: inline-flex;
+      display: flex;
       position: absolute;
       align-items: center;
       /* задаём отступы от краёв блока */
       padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 20);
       /* устанавливаем размеры */
       height: 50%;
-      overflow: hidden;
       width: 100%;
-      white-space: pre-wrap;
 
       /* устанавливаем координаты, относительно которых будем вращать текст */
       transform-origin: center;
       /* поворачиваем текст */
       transform: rotate(var(--rotate));
       /* запрещаем пользователю выделять мышкой текст на секторах */
-      user-select: none;
+      min-width: 0;
+      font-size: 24px;
 
-      span {
-        display: flex;
-        word-wrap: break-word;
+      &_text {
+        display: inline-block;
         align-items: center;
-        width: 37%;
-        height: 48%;
+        line-height: 83px;
+        width: 200px;
         padding: 10px;
-        font-size: 40px;
         font-weight: 700;
         color: #fff;
+        white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
       }
     }
 
+    &_xl {
+      .wheel__item {
+        font-size: 26px !important;
+      }
+    }
+
+    &_lg {
+      .wheel__item {
+        font-size: 20px!important;
+      }
+    }
+
+    &_md {
+      .wheel__item {
+        font-size: 16px !important;
+      }
+    }
+
+    &_sm {
+      .wheel__item {
+        font-size: 14px !important;
+      }
+    }
+
+    &_xs {
+      .wheel__item {
+        font-size: 12px !important;
+      }
+    }
   }
 
   &__border {
@@ -191,6 +222,7 @@ i {
 
   &__entries {
     display: flex;
+
     &_counter {
       display: none;
       width: 25px;
@@ -247,9 +279,9 @@ i {
       border: none;
       border-radius: 5px;
       padding-left: 10px;
-      width: 280px;
-      max-width: 270px;
+      width: 100%;
       height: 100%;
+      margin: 0 10px;
       outline: none;
       font-size: 18px;
     }
@@ -283,8 +315,7 @@ i {
       border: none;
       border-radius: 5px;
       padding-left: 5px;
-      width: 280px;
-      max-width: 270px;
+      width: 100%;
       height: 100%;
       outline: none;
       line-height: 40px;
@@ -310,7 +341,7 @@ i {
     display: flex;
     justify-content: space-between;
     padding-left: 5px;
-    width: 64px;
+    width: 100%;
     max-width: 64px;
     align-items: center;
     margin-left: 8px;
@@ -341,12 +372,12 @@ i {
       max-width: 100%;
 
       .side__text {
-        max-width: 100%;
-        width: 99%;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 0 10px;
+
         .side__inc {
           display: inline-flex;
           align-items: center;
@@ -369,6 +400,17 @@ i {
       .side__buttons {
         display: none;
       }
+    }
+  }
+
+  &.side_amount-off {
+    .side__number {
+      display: none;
+    }
+    .side__input, .side__text {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
     }
   }
 }
@@ -560,3 +602,9 @@ i {
   display: none !important;
 }
 
+
+.amount_checkbox {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+}

@@ -13,6 +13,12 @@ i {
   display: flex;
   justify-content: center;
   font-family: sans-serif;
+  flex-direction: row;
+}
+@media (max-width: 992px) {
+  .app__container {
+    flex-direction: column;
+  }
 }
 
 .wheel {
@@ -24,10 +30,9 @@ i {
   grid-gap: calc(var(--size) / 20);
   align-items: center;
   grid-template-areas: "spinner" "trigger";
-  font-size: calc(var(--size) / 21);
 }
 .wheel.is-spinning .wheel__list {
-  transition: transform 1s cubic-bezier(0.1, -0.01, 0, 1);
+  transition: transform 7s cubic-bezier(0.1, -0.01, 0, 1);
 }
 .wheel > * {
   grid-area: spinner;
@@ -65,35 +70,48 @@ i {
 }
 .wheel__list .wheel__item {
   /* включаем «гибкую» вёрстку */
-  display: inline-flex;
+  display: flex;
   position: absolute;
   align-items: center;
   /* задаём отступы от краёв блока */
   padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 20);
   /* устанавливаем размеры */
   height: 50%;
-  overflow: hidden;
   width: 100%;
-  white-space: pre-wrap;
   /* устанавливаем координаты, относительно которых будем вращать текст */
   transform-origin: center;
   /* поворачиваем текст */
   transform: rotate(var(--rotate));
   /* запрещаем пользователю выделять мышкой текст на секторах */
-  user-select: none;
+  min-width: 0;
+  font-size: 24px;
 }
-.wheel__list .wheel__item span {
-  display: flex;
-  word-wrap: break-word;
+.wheel__list .wheel__item_text {
+  display: inline-block;
   align-items: center;
-  width: 37%;
-  height: 48%;
+  line-height: 83px;
+  width: 200px;
   padding: 10px;
-  font-size: 40px;
   font-weight: 700;
   color: #fff;
+  white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.wheel__list_xl .wheel__item {
+  font-size: 26px !important;
+}
+.wheel__list_lg .wheel__item {
+  font-size: 20px !important;
+}
+.wheel__list_md .wheel__item {
+  font-size: 16px !important;
+}
+.wheel__list_sm .wheel__item {
+  font-size: 14px !important;
+}
+.wheel__list_xs .wheel__item {
+  font-size: 12px !important;
 }
 .wheel__border {
   position: absolute;
@@ -215,9 +233,9 @@ i {
   border: none;
   border-radius: 5px;
   padding-left: 10px;
-  width: 280px;
-  max-width: 270px;
+  width: 100%;
   height: 100%;
+  margin: 0 10px;
   outline: none;
   font-size: 18px;
 }
@@ -247,8 +265,7 @@ i {
   border: none;
   border-radius: 5px;
   padding-left: 5px;
-  width: 280px;
-  max-width: 270px;
+  width: 100%;
   height: 100%;
   outline: none;
   line-height: 40px;
@@ -269,7 +286,7 @@ i {
   display: flex;
   justify-content: space-between;
   padding-left: 5px;
-  width: 64px;
+  width: 100%;
   max-width: 64px;
   align-items: center;
   margin-left: 8px;
@@ -291,8 +308,7 @@ i {
   max-width: 100%;
 }
 .side.side_result .side__item .side__text {
-  max-width: 100%;
-  width: 99%;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -316,6 +332,14 @@ i {
 }
 .side.side_result .side__item .side__buttons {
   display: none;
+}
+.side.side_amount-off .side__number {
+  display: none;
+}
+.side.side_amount-off .side__input, .side.side_amount-off .side__text {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
 }
 
 .wheel-modal {
@@ -481,6 +505,12 @@ i {
 }
 .hide {
   display: none !important;
+}
+
+.amount_checkbox {
+  position: absolute;
+  left: 30px;
+  top: 30px;
 }
 
 /*# sourceMappingURL=index.css.map */

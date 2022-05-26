@@ -244,8 +244,13 @@ const appWheel = (): void => {
                <input name="${item.id}" type="text" class="side__number" value="${item.amount}"/>
                <input name="${item.id}" type="text" class="side__text" value="${item.text}"/>
                <div class="side__buttons">
-                <i class="${!item.hide ? 'fas fa-eye fa-lg hide_button' : 'fas fa-eye-slash fa-lg hide_button'}"></i>
-                <i class="fas fa-times fa-lg remove_button"></i>
+               <button class="hide_button">
+                    <i class="${!item.hide ? 'fas fa-eye fa-lg' : 'fas fa-eye-slash fa-lg'}"></i>      
+               </button>
+               <button class="remove_button">
+                               <i class="fas fa-times fa-lg"></i>
+               </button>
+
                </div>
             </div>
         `
@@ -287,14 +292,15 @@ const appWheel = (): void => {
             .forEach((btn, index: number) => {
                 btn.addEventListener('click', (event: Event) => {
                     // change icon
-                    const target = event.target as Element
-                    !target.classList.contains('fa-eye-slash') ?
-                        target.className = 'fas fa-eye-slash fa-lg hide_button' :
-                        target.className = 'fas fa-eye fa-lg hide_button'
-
+                    const target = event.currentTarget as Element
+                    const children = target.children[0]
+                    !children.classList.contains('fa-eye-slash') ?
+                        children.className = 'fas fa-eye-slash fa-lg' :
+                        children.className = 'fas fa-eye fa-lg'
+                    const id = wheelSegments[index].id
                     //hide segment
+                    wheelSegments.map(segment => segment.id === id ? segment.hide = !segment.hide: null)
 
-                    wheelSegments[index].hide = !wheelSegments[index].hide
                     setupWheel()
                     wheelSegments[index].hide ?
                         wheelSegmentItems[index].classList.add('side__item_hide') :
@@ -306,7 +312,8 @@ const appWheel = (): void => {
         wheelEntries.querySelectorAll('.remove_button')
             .forEach((btn, index: number) => {
                 btn.addEventListener('click', () => {
-                    wheelSegments.splice(index, 1)
+                    const id = wheelSegments[index].id
+                    wheelSegments = wheelSegments.filter(segment => segment.id !== id)
                     wheelSegmentCounter()
                     setupWheel()
                     wheelCreateSegments()
@@ -586,12 +593,23 @@ const appWheel = (): void => {
         function addElements() {
             modalInputEdit.childNodes.forEach(item => {
                 if (item.textContent) {
-                    wheelSegments = [...wheelSegments, {
-                        id: uniqueId(),
-                        amount: 1,
-                        text: item.textContent,
-                        hide: false
-                    }]
+                    if (parseInt(item.textContent)) {
+                        const number = parseInt(item.textContent)
+                        wheelSegments = [...wheelSegments, {
+                            id: uniqueId(),
+                            amount: 1,
+                            text: number,
+                            hide: false
+                        }]
+                    } else {
+                        const string = item.textContent
+                        wheelSegments = [...wheelSegments, {
+                            id: uniqueId(),
+                            amount: 1,
+                            text: string,
+                            hide: false
+                        }]
+                    }
                 }
             })
             modalInputEdit.innerHTML = ""
@@ -645,7 +663,8 @@ const appWheel = (): void => {
                 inc: false
             }
             addSelectResult(result)
-            win.hide = true
+            wheelSegments.filter(segment => segment.id === win.id).map(segment => segment.hide = true)
+            console.log(wheelSegments)
             wheelCreateSegments()
             setupWheel()
             removeListener()
@@ -659,7 +678,7 @@ const appWheel = (): void => {
                 inc: false
             }
             addSelectResult(result)
-            wheelSegments = wheelSegments.filter(segment => !(segment === win))
+            wheelSegments = wheelSegments.filter(segment => !(segment.id === win.id))
             wheelCreateSegments()
             setupWheel()
             removeListener()

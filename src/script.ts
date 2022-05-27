@@ -6,7 +6,7 @@ interface ISegment {
     text: string | number,
     color?: string
     hide: boolean
-    copy?: boolean
+    copy: boolean
 }
 
 interface IResult {
@@ -56,61 +56,71 @@ const appWheel = (): void => {
             id: uniqueId(),
             text: "1",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "2",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "3",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "4",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "5",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "6",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "7",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "8",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "9",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "10",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
     ]
     let notHide: ISegment[] = []
@@ -177,11 +187,12 @@ const appWheel = (): void => {
     }
 
     const wheelHeadIcons = (): void => {
-        const wheelList = document.querySelector<HTMLElement>('#wheelList')!,
-            wheelShuffle = document.querySelector<HTMLElement>('#wheelShuffle')!,
-            wheelSort = document.querySelector<HTMLElement>('#wheelSort')!,
-            wheelTrash = document.querySelector<HTMLElement>('#wheelTrash')!
-        const side = document.querySelector<HTMLElement>('.side')!
+        console.log("start icons")
+        const wheelList = document.querySelector<HTMLButtonElement>('#wheelList')!,
+            wheelShuffle = document.querySelector<HTMLButtonElement>('#wheelShuffle')!,
+            wheelSort = document.querySelector<HTMLButtonElement>('#wheelSort')!,
+            wheelTrash = document.querySelector<HTMLButtonElement>('#wheelTrash')!
+        const side = document.querySelector<HTMLButtonElement>('.side')!
         wheelList.addEventListener('click', wheelModal)
 
         wheelShuffle.addEventListener('click', (): void => {
@@ -191,27 +202,51 @@ const appWheel = (): void => {
         })
 
         wheelSort.addEventListener('click', (event: Event): void => {
-            console.log("click")
             const target = event.target as Element
             const selectedTabResult = side.classList.contains('side_result')
 
-            function sort(elem: ISegment[] | IResult[]) {
+            function sort() {
+                let numbers = wheelSegments.filter((item: ISegment) => typeof item.text === "number")
+                let strings = wheelSegments.filter((item: ISegment) => typeof item.text === "string")
+
                 if (target.classList.contains('sorted')) {
-                    elem.sort((a: ISegment | IResult, b: ISegment | IResult) => a.text > b.text ? -1 : 1)
+                    numbers.sort((a: ISegment, b: ISegment) => <number>b.text - <number>a.text)
+                    strings.sort((a: ISegment, b: ISegment) => <string>a.text > <string>b.text ? -1 : 1)
+                    wheelSegments = numbers.concat(strings)
                     target.classList.remove('sorted')
                 } else {
-                    elem.sort((a: ISegment | IResult, b: ISegment | IResult) => a.text < b.text ? -1 : 1)
+                    numbers.sort((a: ISegment, b: ISegment) => <number>a.text - <number>b.text)
+                    strings.sort((a: ISegment, b: ISegment) => <string>a.text < <string>b.text ? -1 : 1)
+                    wheelSegments = numbers.concat(strings)
                     target.classList.add('sorted')
                 }
-            }
-
-            if (selectedTabResult) {
-                sort(wheelResults)
-            } else {
-                sort(wheelSegments)
                 wheelCreateSegments()
                 setupWheel()
             }
+
+            const resultSort = () => {
+                let numbers = wheelResults.filter((item: IResult) => typeof item.text === "number")
+                let strings = wheelResults.filter((item: IResult) => typeof item.text === "string")
+
+                if (target.classList.contains('sorted')) {
+                    numbers.sort((a: IResult, b: IResult) => <number>b.text - <number>a.text)
+                    strings.sort((a: IResult, b: IResult) => <string>a.text > <string>b.text ? -1 : 1)
+                    wheelResults = numbers.concat(strings)
+                    target.classList.remove('sorted')
+                    console.log(wheelResults)
+                }
+                else {
+                    numbers.sort((a: IResult, b: IResult) => <number>a.text - <number>b.text)
+                    strings.sort((a: IResult, b: IResult) => <string>a.text < <string>b.text ? -1 : 1)
+                    wheelResults = numbers.concat(strings)
+                    target.classList.add('sorted')
+                    console.log(wheelResults)
+                }
+
+                addSelectResult()
+            }
+
+            selectedTabResult ? resultSort() : sort()
         })
 
         wheelTrash.addEventListener('click', (): void => {
@@ -299,9 +334,16 @@ const appWheel = (): void => {
                         children.className = 'fas fa-eye fa-lg'
                     const id = wheelSegments[index].id
                     //hide segment
-                    wheelSegments.map(segment => segment.id === id ? segment.hide = !segment.hide: null)
+                    if (IS_AMOUNT) {
+                        wheelSegments.map(segment => segment.id === id ? segment.hide = !segment.hide : null)
+                    } else {
+                        wheelSegments.map(segment => segment.id === id && !segment.copy ? segment.hide = !segment.hide : null)
+                    }
 
+                    wheelSegmentCounter()
                     setupWheel()
+
+
                     wheelSegments[index].hide ?
                         wheelSegmentItems[index].classList.add('side__item_hide') :
                         wheelSegmentItems[index].classList.remove('side__item_hide')
@@ -350,7 +392,8 @@ const appWheel = (): void => {
                         id: uniqueId(),
                         amount: headAmountValue,
                         text: headInputValue,
-                        hide: false
+                        hide: false,
+                        copy: false
                     }]
                     headInput.value = ''
                     headAmount.value = "1"
@@ -376,22 +419,45 @@ const appWheel = (): void => {
     }
 
     const wheelSegmentCounter = (): void => {
+
         wheelCheckAmount()
+        const wheelShuffle = document.querySelector<HTMLButtonElement>('#wheelShuffle')!,
+            wheelSort = document.querySelector<HTMLButtonElement>('#wheelSort')!,
+            wheelTrash = document.querySelector<HTMLButtonElement>('#wheelTrash')!
 
+        const lockBtn = (): void => {
+            wheelShuffle.disabled = true
+            wheelSort.disabled = true
+            wheelTrash.disabled = true
+        }
+        const unlockBtn = (): void => {
+            wheelShuffle.disabled = false
+            wheelSort.disabled = false
+            wheelTrash.disabled = false
+        }
+        let counterSegment
         let counter = document.querySelector<HTMLDivElement>('.side__entries_counter')!
-        counter.innerHTML = wheelSegments.length.toString()
 
-        if (wheelSegments.length) {
-            counter.style.display = "block"
+        if (IS_AMOUNT) {
+            counterSegment = wheelSegments.filter(segment => !segment.hide)
+        } else {
+            counterSegment = wheelSegments.filter(segment => !segment.hide && !segment.copy)
+        }
+
+
+        counter.innerHTML = counterSegment.length.toString()
+        if (counterSegment.length) {
+            counter.style.display = "flex"
+            unlockBtn()
         } else {
             counter.style.display = "none"
+            lockBtn()
         }
         wheelAddColors()
         wheelCheckCountSegments()
     }
 
     const wheelCheckCountSegments = (): void => {
-        console.log("start")
         const xl = "wheel__list_xl"
         const lg = "wheel__list_lg"
         const md = "wheel__list_md"
@@ -431,19 +497,17 @@ const appWheel = (): void => {
         wheelSegments = arr
     }
 
-    const setupSide = (isAmouts: boolean) => {
+    const setupSide = (isAmounts: boolean) => {
         const side = document.querySelector<HTMLDivElement>(".side")!
-        console.log(isAmouts)
-        if (isAmouts) {
+        if (isAmounts) {
             side.classList.remove("side_amount-off")
-            wheelSegments.filter(segment => segment.copy).map(segment => segment.hide = false)
-            console.log(wheelSegments)
+            wheelSegments.filter(segment => !segment.copy)
         } else {
             side.classList.add("side_amount-off")
-            wheelSegments.filter(segment => segment.copy).map(segment => segment.hide = true)
             console.log(wheelSegments)
         }
         setupWheel()
+        wheelSegmentCounter()
     }
 
 // =================result===============
@@ -454,14 +518,13 @@ const appWheel = (): void => {
         resultsCounter.innerHTML = wheelResults.length.toString()
 
         if (wheelResults.length) {
-            resultsCounter.style.display = "block"
+            resultsCounter.style.display = "flex"
         } else {
             resultsCounter.style.display = "none"
         }
     }
 
     const addSelectResult = (result?: IResult): void => {
-        console.log("win", result)
         const body = document.querySelector<HTMLElement>('.tab-results')!
         let check: boolean = true
         const resultHtml = (item: IResult): string => {
@@ -490,7 +553,6 @@ const appWheel = (): void => {
                     body.innerHTML += resultHtml(item)
                 })
             } else if (wheelResults.length === 0) {
-                console.log("пусто")
                 body.innerHTML = 'Пусто'
             }
 
@@ -499,13 +561,11 @@ const appWheel = (): void => {
             if (wheelResults.length) {
                 wheelResults.map(item => {
                     if ((item.id === result?.id) && (item.inc && result.inc)) {
-                        console.log("if ", item)
                         item.value++
                         check = false
                     }
                 })
                 if (check) {
-                    console.log(check)
                     wheelResults = [...wheelResults, result]
                 }
             } else {
@@ -599,7 +659,8 @@ const appWheel = (): void => {
                             id: uniqueId(),
                             amount: 1,
                             text: number,
-                            hide: false
+                            hide: false,
+                            copy: false
                         }]
                     } else {
                         const string = item.textContent
@@ -607,7 +668,8 @@ const appWheel = (): void => {
                             id: uniqueId(),
                             amount: 1,
                             text: string,
-                            hide: false
+                            hide: false,
+                            copy: false
                         }]
                     }
                 }
@@ -621,7 +683,7 @@ const appWheel = (): void => {
         modalAddBtn.addEventListener('click', addElements)
     }
 
-    const winModal = (win: ISegment, selected: number, winText: string): void => {
+    const winModal = (win: ISegment, selected: number, winText: string | number): void => {
         const modal = document.querySelector<HTMLDivElement>('#wheelModalWin')!,
             modalCloseButton = document.querySelectorAll<HTMLButtonElement>('.wheel-modal_close')!,
             text = modal.querySelector<HTMLHeadElement>('.wheel-modal__title')!,
@@ -630,10 +692,9 @@ const appWheel = (): void => {
             btnHide = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_hide')!,
             btnInc = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_inc')!
 
-        console.log(win.id, win.text)
         modalOpen(modal)
 
-        text.innerHTML = winText
+        text.innerHTML = String(winText)
 
         if (modalCloseButton.length > 0) {
             modalCloseButton.forEach(btn => {
@@ -664,7 +725,6 @@ const appWheel = (): void => {
             }
             addSelectResult(result)
             wheelSegments.filter(segment => segment.id === win.id).map(segment => segment.hide = true)
-            console.log(wheelSegments)
             wheelCreateSegments()
             setupWheel()
             removeListener()
@@ -765,14 +825,20 @@ const appWheel = (): void => {
     }
 
     const selectSegment = (): void => {
-        let curSegment = rotation + 270
+        let curSegment: number = rotation + 270
         curSegment > 360 ? curSegment %= 360 : null
-        const selected = Math.floor(curSegment / segmentSlice)
+        const selected: number = Math.floor(curSegment / segmentSlice)
+        let text: any = prizeNodes[selected].textContent!.replace(/\s+/g, ' ').trim()
+
+        if (parseInt(text)) {
+            text = parseInt(text)
+        }
+
         prizeNodes[selected].classList.add(selectedClass)
         winModal(
             notHide[selected],
             selected,
-            prizeNodes[selected].textContent!.replace(/\s+/g, ' ').trim()
+            text
         )
     }
 
@@ -782,8 +848,13 @@ const appWheel = (): void => {
             segmentNotHide = plug.filter(segment => !segment.hide)
             segmentSlice = 360 / segmentNotHide.length;
         } else {
-            segmentNotHide = wheelSegments.filter(segment => !segment.hide)
-            segmentSlice = 360 / segmentNotHide.length;
+            if (!IS_AMOUNT) {
+                segmentNotHide = wheelSegments.filter(segment => !segment.hide && !segment.copy)
+                segmentSlice = 360 / segmentNotHide.length;
+            } else {
+                segmentNotHide = wheelSegments.filter(segment => !segment.hide)
+                segmentSlice = 360 / segmentNotHide.length;
+            }
         }
         wheelCreateSegmentsColor()
         wheelCreateSegmentsNodes()
@@ -794,6 +865,17 @@ const appWheel = (): void => {
 // отслеживаем нажатие на кнопку
 
     trigger.addEventListener('click', () => {
+        const side = document.querySelector('.side')!
+        const inputs = side.querySelectorAll<HTMLInputElement>('input')!
+        const buttons = side.querySelectorAll<HTMLButtonElement>('button')!
+
+        inputs.forEach(input => {
+            input.readOnly = true
+        })
+
+        buttons.forEach(btn => {
+            wheelDisabledBtn(btn)
+        })
         // делаем её недоступной для нажатия
         wheelDisabledBtn(trigger)
         // задаём начальное вращение колеса
@@ -808,6 +890,10 @@ const appWheel = (): void => {
 
 // отслеживаем остановку колеса
     wheelList.addEventListener('transitionend', () => {
+        const side = document.querySelector('.side')!
+        const inputs = side.querySelectorAll<HTMLInputElement>('input')!
+        const buttons = side.querySelectorAll<HTMLButtonElement>('button')!
+
         rotation %= 360
 
         selectSegment()
@@ -817,6 +903,14 @@ const appWheel = (): void => {
         wheelList.style.setProperty("--rotate", rotation.toString())
 
         wheelDisabledBtn(trigger)
+
+        inputs.forEach(input => {
+            input.readOnly = false
+        })
+
+        buttons.forEach(btn => {
+            wheelDisabledBtn(btn)
+        })
     })
 
 // отслеживаем нажатие на чекбокс
@@ -831,7 +925,6 @@ const appWheel = (): void => {
     wheelTabs()
     wheelHeadIcons()
     wheelAddSegment()
-    setupWheel()
 }
 
 appWheel()

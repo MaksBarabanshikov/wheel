@@ -32,61 +32,71 @@ const appWheel = () => {
             id: uniqueId(),
             text: "1",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "2",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "3",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "4",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "5",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "6",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "7",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "8",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "9",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
         {
             id: uniqueId(),
             text: "10",
             hide: false,
-            amount: 1
+            amount: 1,
+            copy: false
         },
     ];
     let notHide = [];
@@ -129,6 +139,7 @@ const appWheel = () => {
         }
     };
     const wheelHeadIcons = () => {
+        console.log("start icons");
         const wheelList = document.querySelector('#wheelList'), wheelShuffle = document.querySelector('#wheelShuffle'), wheelSort = document.querySelector('#wheelSort'), wheelTrash = document.querySelector('#wheelTrash');
         const side = document.querySelector('.side');
         wheelList.addEventListener('click', wheelModal);
@@ -138,27 +149,46 @@ const appWheel = () => {
             setupWheel();
         });
         wheelSort.addEventListener('click', (event) => {
-            console.log("click");
             const target = event.target;
             const selectedTabResult = side.classList.contains('side_result');
-            function sort(elem) {
+            function sort() {
+                let numbers = wheelSegments.filter((item) => typeof item.text === "number");
+                let strings = wheelSegments.filter((item) => typeof item.text === "string");
                 if (target.classList.contains('sorted')) {
-                    elem.sort((a, b) => a.text > b.text ? -1 : 1);
+                    numbers.sort((a, b) => b.text - a.text);
+                    strings.sort((a, b) => a.text > b.text ? -1 : 1);
+                    wheelSegments = numbers.concat(strings);
                     target.classList.remove('sorted');
                 }
                 else {
-                    elem.sort((a, b) => a.text < b.text ? -1 : 1);
+                    numbers.sort((a, b) => a.text - b.text);
+                    strings.sort((a, b) => a.text < b.text ? -1 : 1);
+                    wheelSegments = numbers.concat(strings);
                     target.classList.add('sorted');
                 }
-            }
-            if (selectedTabResult) {
-                sort(wheelResults);
-            }
-            else {
-                sort(wheelSegments);
                 wheelCreateSegments();
                 setupWheel();
             }
+            const resultSort = () => {
+                let numbers = wheelResults.filter((item) => typeof item.text === "number");
+                let strings = wheelResults.filter((item) => typeof item.text === "string");
+                if (target.classList.contains('sorted')) {
+                    numbers.sort((a, b) => b.text - a.text);
+                    strings.sort((a, b) => a.text > b.text ? -1 : 1);
+                    wheelResults = numbers.concat(strings);
+                    target.classList.remove('sorted');
+                    console.log(wheelResults);
+                }
+                else {
+                    numbers.sort((a, b) => a.text - b.text);
+                    strings.sort((a, b) => a.text < b.text ? -1 : 1);
+                    wheelResults = numbers.concat(strings);
+                    target.classList.add('sorted');
+                    console.log(wheelResults);
+                }
+                addSelectResult();
+            };
+            selectedTabResult ? resultSort() : sort();
         });
         wheelTrash.addEventListener('click', () => {
             const selectedTabResult = side.classList.contains('side_result');
@@ -231,7 +261,13 @@ const appWheel = () => {
                     children.className = 'fas fa-eye-slash fa-lg' :
                     children.className = 'fas fa-eye fa-lg';
                 const id = wheelSegments[index].id;
-                wheelSegments.map(segment => segment.id === id ? segment.hide = !segment.hide : null);
+                if (IS_AMOUNT) {
+                    wheelSegments.map(segment => segment.id === id ? segment.hide = !segment.hide : null);
+                }
+                else {
+                    wheelSegments.map(segment => segment.id === id && !segment.copy ? segment.hide = !segment.hide : null);
+                }
+                wheelSegmentCounter();
                 setupWheel();
                 wheelSegments[index].hide ?
                     wheelSegmentItems[index].classList.add('side__item_hide') :
@@ -273,7 +309,8 @@ const appWheel = () => {
                             id: uniqueId(),
                             amount: headAmountValue,
                             text: headInputValue,
-                            hide: false
+                            hide: false,
+                            copy: false
                         }];
                     headInput.value = '';
                     headAmount.value = "1";
@@ -295,19 +332,38 @@ const appWheel = () => {
     };
     const wheelSegmentCounter = () => {
         wheelCheckAmount();
+        const wheelShuffle = document.querySelector('#wheelShuffle'), wheelSort = document.querySelector('#wheelSort'), wheelTrash = document.querySelector('#wheelTrash');
+        const lockBtn = () => {
+            wheelShuffle.disabled = true;
+            wheelSort.disabled = true;
+            wheelTrash.disabled = true;
+        };
+        const unlockBtn = () => {
+            wheelShuffle.disabled = false;
+            wheelSort.disabled = false;
+            wheelTrash.disabled = false;
+        };
+        let counterSegment;
         let counter = document.querySelector('.side__entries_counter');
-        counter.innerHTML = wheelSegments.length.toString();
-        if (wheelSegments.length) {
-            counter.style.display = "block";
+        if (IS_AMOUNT) {
+            counterSegment = wheelSegments.filter(segment => !segment.hide);
+        }
+        else {
+            counterSegment = wheelSegments.filter(segment => !segment.hide && !segment.copy);
+        }
+        counter.innerHTML = counterSegment.length.toString();
+        if (counterSegment.length) {
+            counter.style.display = "flex";
+            unlockBtn();
         }
         else {
             counter.style.display = "none";
+            lockBtn();
         }
         wheelAddColors();
         wheelCheckCountSegments();
     };
     const wheelCheckCountSegments = () => {
-        console.log("start");
         const xl = "wheel__list_xl";
         const lg = "wheel__list_lg";
         const md = "wheel__list_md";
@@ -344,33 +400,30 @@ const appWheel = () => {
         });
         wheelSegments = arr;
     };
-    const setupSide = (isAmouts) => {
+    const setupSide = (isAmounts) => {
         const side = document.querySelector(".side");
-        console.log(isAmouts);
-        if (isAmouts) {
+        if (isAmounts) {
             side.classList.remove("side_amount-off");
-            wheelSegments.filter(segment => segment.copy).map(segment => segment.hide = false);
-            console.log(wheelSegments);
+            wheelSegments.filter(segment => !segment.copy);
         }
         else {
             side.classList.add("side_amount-off");
-            wheelSegments.filter(segment => segment.copy).map(segment => segment.hide = true);
             console.log(wheelSegments);
         }
         setupWheel();
+        wheelSegmentCounter();
     };
     const wheelResultCounter = () => {
         let resultsCounter = document.querySelector('.side__counter');
         resultsCounter.innerHTML = wheelResults.length.toString();
         if (wheelResults.length) {
-            resultsCounter.style.display = "block";
+            resultsCounter.style.display = "flex";
         }
         else {
             resultsCounter.style.display = "none";
         }
     };
     const addSelectResult = (result) => {
-        console.log("win", result);
         const body = document.querySelector('.tab-results');
         let check = true;
         const resultHtml = (item) => {
@@ -400,7 +453,6 @@ const appWheel = () => {
                 });
             }
             else if (wheelResults.length === 0) {
-                console.log("пусто");
                 body.innerHTML = 'Пусто';
             }
         };
@@ -408,13 +460,11 @@ const appWheel = () => {
             if (wheelResults.length) {
                 wheelResults.map(item => {
                     if ((item.id === (result === null || result === void 0 ? void 0 : result.id)) && (item.inc && result.inc)) {
-                        console.log("if ", item);
                         item.value++;
                         check = false;
                     }
                 });
                 if (check) {
-                    console.log(check);
                     wheelResults = [...wheelResults, result];
                 }
             }
@@ -493,7 +543,8 @@ const appWheel = () => {
                                 id: uniqueId(),
                                 amount: 1,
                                 text: number,
-                                hide: false
+                                hide: false,
+                                copy: false
                             }];
                     }
                     else {
@@ -502,7 +553,8 @@ const appWheel = () => {
                                 id: uniqueId(),
                                 amount: 1,
                                 text: string,
-                                hide: false
+                                hide: false,
+                                copy: false
                             }];
                     }
                 }
@@ -516,9 +568,8 @@ const appWheel = () => {
     };
     const winModal = (win, selected, winText) => {
         const modal = document.querySelector('#wheelModalWin'), modalCloseButton = document.querySelectorAll('.wheel-modal_close'), text = modal.querySelector('.wheel-modal__title'), btnAdd = modal.querySelector('.wheel-modal__button_ok'), btnRemove = modal.querySelector('.wheel-modal__button_remove'), btnHide = modal.querySelector('.wheel-modal__button_hide'), btnInc = modal.querySelector('.wheel-modal__button_inc');
-        console.log(win.id, win.text);
         modalOpen(modal);
-        text.innerHTML = winText;
+        text.innerHTML = String(winText);
         if (modalCloseButton.length > 0) {
             modalCloseButton.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -545,7 +596,6 @@ const appWheel = () => {
             };
             addSelectResult(result);
             wheelSegments.filter(segment => segment.id === win.id).map(segment => segment.hide = true);
-            console.log(wheelSegments);
             wheelCreateSegments();
             setupWheel();
             removeListener();
@@ -625,8 +675,12 @@ const appWheel = () => {
         let curSegment = rotation + 270;
         curSegment > 360 ? curSegment %= 360 : null;
         const selected = Math.floor(curSegment / segmentSlice);
+        let text = prizeNodes[selected].textContent.replace(/\s+/g, ' ').trim();
+        if (parseInt(text)) {
+            text = parseInt(text);
+        }
         prizeNodes[selected].classList.add(selectedClass);
-        winModal(notHide[selected], selected, prizeNodes[selected].textContent.replace(/\s+/g, ' ').trim());
+        winModal(notHide[selected], selected, text);
     };
     const setupWheel = () => {
         notHide = wheelSegments.filter(segment => !segment.hide);
@@ -635,14 +689,29 @@ const appWheel = () => {
             segmentSlice = 360 / segmentNotHide.length;
         }
         else {
-            segmentNotHide = wheelSegments.filter(segment => !segment.hide);
-            segmentSlice = 360 / segmentNotHide.length;
+            if (!IS_AMOUNT) {
+                segmentNotHide = wheelSegments.filter(segment => !segment.hide && !segment.copy);
+                segmentSlice = 360 / segmentNotHide.length;
+            }
+            else {
+                segmentNotHide = wheelSegments.filter(segment => !segment.hide);
+                segmentSlice = 360 / segmentNotHide.length;
+            }
         }
         wheelCreateSegmentsColor();
         wheelCreateSegmentsNodes();
         prizeNodes = wheel.querySelectorAll('.wheel__item');
     };
     trigger.addEventListener('click', () => {
+        const side = document.querySelector('.side');
+        const inputs = side.querySelectorAll('input');
+        const buttons = side.querySelectorAll('button');
+        inputs.forEach(input => {
+            input.readOnly = true;
+        });
+        buttons.forEach(btn => {
+            wheelDisabledBtn(btn);
+        });
         wheelDisabledBtn(trigger);
         rotation = Math.floor(Math.random() * 360 + spinertia(2000, 5000));
         prizeNodes.forEach(win => win.classList.remove(selectedClass));
@@ -650,11 +719,20 @@ const appWheel = () => {
         wheelList.style.setProperty("--rotate", rotation.toString());
     });
     wheelList.addEventListener('transitionend', () => {
+        const side = document.querySelector('.side');
+        const inputs = side.querySelectorAll('input');
+        const buttons = side.querySelectorAll('button');
         rotation %= 360;
         selectSegment();
         wheel.classList.remove(spinClass);
         wheelList.style.setProperty("--rotate", rotation.toString());
         wheelDisabledBtn(trigger);
+        inputs.forEach(input => {
+            input.readOnly = false;
+        });
+        buttons.forEach(btn => {
+            wheelDisabledBtn(btn);
+        });
     });
     wheelCheckboxAmount.addEventListener('click', () => {
         IS_AMOUNT = !IS_AMOUNT;
@@ -665,7 +743,6 @@ const appWheel = () => {
     wheelTabs();
     wheelHeadIcons();
     wheelAddSegment();
-    setupWheel();
 };
 appWheel();
 //# sourceMappingURL=script.js.map

@@ -359,6 +359,9 @@ button:disabled i {
   width: 50px;
   height: 100%;
   line-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   border-radius: 5px;
   border: none;

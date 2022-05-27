@@ -1,111 +1,1 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Wheel</title>
-    <link rel="stylesheet" href="index.css">
-    <script src="https://kit.fontawesome.com/cf05a5d9e7.js" crossorigin="anonymous"></script>
-    <script src="script.js" defer></script>
-</head>
-<body>
-<div class="app__main">
-    <div class="app__container">
-        <div class="app__wheel wheel">
-            <ul class="wheel__list wheel__list_xl"></ul>
-            <div class="wheel__circle">
-                <button class="wheel__play">
-                    <i class="fas fa-play"></i>
-                </button>
-            </div>
-            <div class="wheel__border"></div>
-        </div>
-        <div class="app__side side">
-            <div class="side__tabs">
-                <div class="side__links">
-                    <div class="side__entries">
-                        <a class="side__tab side__tab_active"
-                           href="#"
-                           data-tab-name="tab-entries"
-                        >
-                            Entries
-                        </a>
-                        <div class="side__entries_counter"></div>
-                    </div>
-                    <div class="side__results">
-                        <a class="side__tab"
-                           href="#"
-                           data-tab-name="tab-results"
-                        >
-                            Results
-                        </a>
-                        <div class="side__counter"></div>
-                    </div>
-                </div>
-                <div class="side__icons">
-                    <button id="wheelList">
-                        <i class="fas fa-list fa-lg"></i>
-                    </button>
-                    <button id="wheelShuffle">
-                        <i class="fas fa-random fa-lg"></i>
-                    </button>
-                    <button id="wheelSort">
-                        <i class="fas fa-sort"></i>
-                    </button>
-                    <button id="wheelTrash">
-                        <i class="fas fa-trash-alt fa-lg"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="side__field">
-                <div class="side__head">
-                    <input id="wheelMainAmount" class="side__number" value="1"/>
-                    <input id="wheelMainInput" class="side__input" type="text" placeholder="Input text here..."/>
-                    <button id="wheelAddSegment" class="side__btn">Ok</button>
-                </div>
-                <div id="wheelEntries" class="side__body side__body_active tab-entries"></div>
-                <div class="side__body tab-results">
-                    Пусто
-                </div>
-            </div>
-        </div>
-        <div id="wheelModal" class="app__wheel-modal wheel-modal">
-            <div class="wheel-modal__body">
-                <div class="wheel-modal__content">
-                    <div class="wheel-modal__input">
-                        <div class="wheel-modal__input-editable" aria-placeholder="Введите/Вставьте свои новые поля"
-                             contenteditable="true"></div>
-                    </div>
-                    <div class="wheel-modal__buttons">
-                        <button class="wheel-modal__button wheel-modal__button_cansel wheel-modal_close">Отмена</button>
-                        <button class="wheel-modal__button wheel-modal__button_add wheel-modal_close">Добавить</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="wheelModalWin" class="app__wheel-modal wheel-modal">
-            <div class="wheel-modal__body">
-                <div class="wheel-modal__content">
-                    <div class="wheel-modal__win">
-                        <h3 class="wheel-modal__title"></h3>
-                    </div>
-                    <div class="wheel-modal__buttons">
-                        <button class="wheel-modal__button wheel-modal__button_ok wheel-modal_close">OK</button>
-                        <button class="wheel-modal__button wheel-modal__button_hide wheel-modal_close">Hide</button>
-                        <button class="wheel-modal__button wheel-modal__button_remove wheel-modal_close">Remove</button>
-                        <button class="wheel-modal__button wheel-modal__button_inc wheel-modal_close">+1</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="amount_checkbox">
-            <label for="wheelCheckBox">Включить счетчик?</label>
-            <input id="wheelCheckBox" type="checkbox" checked>
-        </div>
-    </div>
-</div>
-</body>
-</html>
-
+<!doctype html><html lang="en"><head>    <meta charset="UTF-8">    <meta name="viewport"          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">    <meta http-equiv="X-UA-Compatible" content="ie=edge">    <title>Wheel</title>    <link rel="stylesheet" href="./css/index.css">    <script src="https://kit.fontawesome.com/cf05a5d9e7.js" crossorigin="anonymous"></script>    <script src="./js/main.js" defer></script></head><body><div class="app__main">    <div class="app__container">        <div class="app__wheel wheel">            <ul class="wheel__list wheel__list_xl"></ul>            <div class="wheel__circle">                <button class="wheel__play">                    <i class="fas fa-play"></i>                </button>            </div>            <div class="wheel__border"></div>        </div>        <div class="app__side side">            <div class="side__tabs">                <div class="side__links">                    <div class="side__entries">                        <a class="side__tab side__tab_active"                           href="#"                           data-tab-name="tab-entries"                        >                            Entries                        </a>                        <div class="side__entries_counter"></div>                    </div>                    <div class="side__results">                        <a class="side__tab"                           href="#"                           data-tab-name="tab-results"                        >                            Results                        </a>                        <div class="side__counter"></div>                    </div>                </div>                <div class="side__icons">                    <button id="wheelList">                        <i class="fas fa-list fa-lg"></i>                    </button>                    <button id="wheelShuffle">                        <i class="fas fa-random fa-lg"></i>                    </button>                    <button id="wheelSort">                        <i class="fas fa-sort"></i>                    </button>                    <button id="wheelTrash">                        <i class="fas fa-trash-alt fa-lg"></i>                    </button>                </div>            </div>            <div class="side__field">                <div class="side__head">                    <input id="wheelMainAmount" class="side__number" value="1"/>                    <input id="wheelMainInput" class="side__input" type="text" placeholder="Input text here..."/>                    <button id="wheelAddSegment" class="side__btn">Ok</button>                </div>                <div id="wheelEntries" class="side__body side__body_active tab-entries"></div>                <div class="side__body tab-results">                    Пусто                </div>            </div>        </div>        <div id="wheelModal" class="app__wheel-modal wheel-modal">            <div class="wheel-modal__body">                <div class="wheel-modal__content">                    <div class="wheel-modal__input">                        <div class="wheel-modal__input-editable" aria-placeholder="Введите/Вставьте свои новые поля"                             contenteditable="true"></div>                    </div>                    <div class="wheel-modal__buttons">                        <button class="wheel-modal__button wheel-modal__button_cansel wheel-modal_close">Отмена</button>                        <button class="wheel-modal__button wheel-modal__button_add wheel-modal_close">Добавить</button>                    </div>                </div>            </div>        </div>        <div id="wheelModalWin" class="app__wheel-modal wheel-modal">            <div class="wheel-modal__body">                <div class="wheel-modal__content">                    <div class="wheel-modal__win">                        <h3 class="wheel-modal__title"></h3>                    </div>                    <div class="wheel-modal__buttons">                        <button class="wheel-modal__button wheel-modal__button_ok wheel-modal_close">OK</button>                        <button class="wheel-modal__button wheel-modal__button_hide wheel-modal_close">Hide</button>                        <button class="wheel-modal__button wheel-modal__button_remove wheel-modal_close">Remove</button>                        <button class="wheel-modal__button wheel-modal__button_inc wheel-modal_close">+1</button>                    </div>                </div>            </div>        </div>        <div class="amount_checkbox">            <label for="wheelCheckBox">Включить счетчик?</label>            <input id="wheelCheckBox" type="checkbox" checked>        </div>    </div></div></body></html>

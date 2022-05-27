@@ -18,10 +18,12 @@ interface IResult {
 
 //=============variables==============
 const appWheel = (): void => {
-    let wheelSegments: ISegment[] = []
-    let wheelResults: IResult[] = []
-
-    let IS_AMOUNT = true
+    let wheelSegments: ISegment[]
+    !localStorage.localWheelSegment ? wheelSegments = [] : wheelSegments = JSON.parse(localStorage.getItem('localWheelSegment')!)
+    let wheelResults: IResult[]
+    !localStorage.localWheelResult ? wheelResults = [] : wheelResults = JSON.parse(localStorage.getItem('localWheelResult')!)
+    // check local
+    let IS_AMOUNT: boolean = true
 
     const wheelCheckboxAmount: HTMLInputElement = document.querySelector("#wheelCheckBox")!
     const colors: Array<string> = [
@@ -147,6 +149,15 @@ const appWheel = (): void => {
         return Math.random().toString(16).slice(2)
     } // unique value for wheel segment
 
+//=============localStorage=============
+    const updateLocalSegment = (): void => {
+        localStorage.setItem('localWheelSegment', JSON.stringify(wheelSegments))
+    }
+
+    const updateLocalResult = (): void => {
+        localStorage.setItem('localWheelResult', JSON.stringify(wheelResults))
+    }
+
 //=============side==============
 
     const wheelTabs = (): void => {
@@ -187,7 +198,6 @@ const appWheel = (): void => {
     }
 
     const wheelHeadIcons = (): void => {
-        console.log("start icons")
         const wheelList = document.querySelector<HTMLButtonElement>('#wheelList')!,
             wheelShuffle = document.querySelector<HTMLButtonElement>('#wheelShuffle')!,
             wheelSort = document.querySelector<HTMLButtonElement>('#wheelSort')!,
@@ -233,14 +243,11 @@ const appWheel = (): void => {
                     strings.sort((a: IResult, b: IResult) => <string>a.text > <string>b.text ? -1 : 1)
                     wheelResults = numbers.concat(strings)
                     target.classList.remove('sorted')
-                    console.log(wheelResults)
-                }
-                else {
+                } else {
                     numbers.sort((a: IResult, b: IResult) => <number>a.text - <number>b.text)
                     strings.sort((a: IResult, b: IResult) => <string>a.text < <string>b.text ? -1 : 1)
                     wheelResults = numbers.concat(strings)
                     target.classList.add('sorted')
-                    console.log(wheelResults)
                 }
 
                 addSelectResult()
@@ -339,7 +346,6 @@ const appWheel = (): void => {
                     } else {
                         wheelSegments.map(segment => segment.id === id && !segment.copy ? segment.hide = !segment.hide : null)
                     }
-
                     wheelSegmentCounter()
                     setupWheel()
 
@@ -356,6 +362,7 @@ const appWheel = (): void => {
                 btn.addEventListener('click', () => {
                     const id = wheelSegments[index].id
                     wheelSegments = wheelSegments.filter(segment => segment.id !== id)
+
                     wheelSegmentCounter()
                     setupWheel()
                     wheelCreateSegments()
@@ -504,9 +511,9 @@ const appWheel = (): void => {
             wheelSegments.filter(segment => !segment.copy)
         } else {
             side.classList.add("side_amount-off")
-            console.log(wheelSegments)
         }
         setupWheel()
+        addSelectResult()
         wheelSegmentCounter()
     }
 
@@ -514,14 +521,13 @@ const appWheel = (): void => {
 
     const wheelResultCounter = (): void => {
         let resultsCounter = document.querySelector<HTMLDivElement>('.side__counter')!
-
-        resultsCounter.innerHTML = wheelResults.length.toString()
-
         if (wheelResults.length) {
             resultsCounter.style.display = "flex"
+            resultsCounter.innerHTML = wheelResults.length.toString()
         } else {
             resultsCounter.style.display = "none"
         }
+        updateLocalResult()
     }
 
     const addSelectResult = (result?: IResult): void => {
@@ -568,7 +574,8 @@ const appWheel = (): void => {
                 if (check) {
                     wheelResults = [...wheelResults, result]
                 }
-            } else {
+            }
+            else {
                 wheelResults = [...wheelResults, result]
             }
         }
@@ -662,7 +669,8 @@ const appWheel = (): void => {
                             hide: false,
                             copy: false
                         }]
-                    } else {
+                    }
+                    else {
                         const string = item.textContent
                         wheelSegments = [...wheelSegments, {
                             id: uniqueId(),
@@ -858,6 +866,7 @@ const appWheel = (): void => {
         }
         wheelCreateSegmentsColor()
         wheelCreateSegmentsNodes()
+        updateLocalSegment()
 
         prizeNodes = wheel.querySelectorAll('.wheel__item')
     }

@@ -14,19 +14,25 @@ interface IResult {
     text: string | number
     value: number
     inc: boolean
+    date: number
 }
 
 //=============variables==============
 const appWheel = (): void => {
+    // localStorage или значение по умолчанию
     let wheelSegments: ISegment[]
     !localStorage.localWheelSegment ? wheelSegments = [] : wheelSegments = JSON.parse(localStorage.getItem('localWheelSegment')!)
     let wheelResults: IResult[]
     !localStorage.localWheelResult ? wheelResults = [] : wheelResults = JSON.parse(localStorage.getItem('localWheelResult')!)
-    // check local
-    let IS_AMOUNT: boolean = true
 
+    let IS_AMOUNT: boolean
+    !localStorage.localWheelAmount ? IS_AMOUNT = false : IS_AMOUNT = JSON.parse(localStorage.getItem('localWheelAmount')!)
+
+    //checkbox количества
     const wheelCheckboxAmount: HTMLInputElement = document.querySelector("#wheelCheckBox")!
-    const colors: Array<string> = [
+    wheelCheckboxAmount.checked = IS_AMOUNT
+    // цвет секций
+    let colors: Array<string> = [
         "#F7A326",
         "#f6c42d",
         "#F8E754",
@@ -44,7 +50,12 @@ const appWheel = (): void => {
         "#EE5D52",
         "#F86E43",
     ]
+    // изначальный массив
     const curColors: Array<string> = [...colors]
+
+    const hideAllBtn = document.querySelector('#wheelHideAll')!
+    const resetIncAllBtn = document.querySelector('#wheelResetIncAll')!
+    const wheelModalRemoveBtn = document.querySelector('#wheelRemoveBtn')!
 
     let wheelSegmentItems: NodeListOf<Element>
 
@@ -131,6 +142,7 @@ const appWheel = (): void => {
 
     let segmentNotHide = wheelSegments.filter(segment => !segment.hide)
     let segmentSlice = 360 / segmentNotHide.length;
+    let currentSlice = 0
 
 // css классы для событий
 
@@ -145,6 +157,34 @@ const appWheel = (): void => {
 
     let prizeNodes: NodeListOf<Element>
 
+    let tickerMusic
+
+    //музыка
+
+    const buttonMusic = ():void => {
+        let audio = document.querySelector<HTMLAudioElement>("#wheelMusicButton")!.play();
+        audio.then(function () {
+        }).catch(function (error) {
+            console.log(error)
+        })
+    }
+
+    const tickMusic = ():void => {
+        let audio = document.querySelector<HTMLAudioElement>("#wheelMusicTick")!.play();
+        audio.then(function () {
+        }).catch(function (error) {
+            console.log(error)
+        })
+    }
+    const winMusic = ():void => {
+        let audio = document.querySelector<HTMLAudioElement>("#wheelMusicWin")!.play();
+        audio.then(function () {
+        }).catch(function (error) {
+            console.log(error)
+        })
+    }
+
+
     function uniqueId(): string {
         return Math.random().toString(16).slice(2)
     } // unique value for wheel segment
@@ -158,11 +198,16 @@ const appWheel = (): void => {
         localStorage.setItem('localWheelResult', JSON.stringify(wheelResults))
     }
 
+    const updateLocalAmount = (): void => {
+        localStorage.setItem('localWheelAmount', JSON.stringify(IS_AMOUNT))
+    }
+
 //=============side==============
 
     const wheelTabs = (): void => {
         const tabs = document.querySelectorAll<HTMLAnchorElement>('.side__tab')!,
             tabsBody = document.querySelectorAll<HTMLDivElement>('.side__body')
+
         tabs.forEach((el: HTMLAnchorElement) => {
             el.addEventListener('click', selectTab)
         })
@@ -201,8 +246,24 @@ const appWheel = (): void => {
         const wheelList = document.querySelector<HTMLButtonElement>('#wheelList')!,
             wheelShuffle = document.querySelector<HTMLButtonElement>('#wheelShuffle')!,
             wheelSort = document.querySelector<HTMLButtonElement>('#wheelSort')!,
-            wheelTrash = document.querySelector<HTMLButtonElement>('#wheelTrash')!
+            wheelTrash = document.querySelector<HTMLButtonElement>('#wheelTrash')!,
+            wheelSortResult = document.querySelector<HTMLButtonElement>('#wheelSortResult')!,
+            wheelCurListResult = document.querySelector<HTMLButtonElement>('#wheelCurListResult')!,
+            wheelTrashResult = document.querySelector<HTMLButtonElement>('#wheelTrashResult')!,
+            wheelSortIncResult = document.querySelector<HTMLButtonElement>('#wheelSortIncResult')!,
+            buttons = document.querySelectorAll<HTMLButtonElement>('.side__icons_btn')!
+
         const side = document.querySelector<HTMLButtonElement>('.side')!
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const curBtn = this.id
+                buttons.forEach(button => {
+                    curBtn !== button.id ? button.classList.remove('sorted') : null
+                })
+            })
+        })
+
         wheelList.addEventListener('click', wheelModal)
 
         wheelShuffle.addEventListener('click', (): void => {
@@ -211,49 +272,28 @@ const appWheel = (): void => {
             setupWheel()
         })
 
-        wheelSort.addEventListener('click', (event: Event): void => {
-            const target = event.target as Element
-            const selectedTabResult = side.classList.contains('side_result')
+        wheelSort.addEventListener('click', (): void => {
 
-            function sort() {
+            const sort = () => {
                 let numbers = wheelSegments.filter((item: ISegment) => typeof item.text === "number")
                 let strings = wheelSegments.filter((item: ISegment) => typeof item.text === "string")
 
-                if (target.classList.contains('sorted')) {
+                if (wheelSort.classList.contains('sorted')) {
                     numbers.sort((a: ISegment, b: ISegment) => <number>b.text - <number>a.text)
                     strings.sort((a: ISegment, b: ISegment) => <string>a.text > <string>b.text ? -1 : 1)
                     wheelSegments = numbers.concat(strings)
-                    target.classList.remove('sorted')
+                    wheelSort.classList.remove('sorted')
                 } else {
                     numbers.sort((a: ISegment, b: ISegment) => <number>a.text - <number>b.text)
                     strings.sort((a: ISegment, b: ISegment) => <string>a.text < <string>b.text ? -1 : 1)
                     wheelSegments = numbers.concat(strings)
-                    target.classList.add('sorted')
+                    wheelSort.classList.add('sorted')
                 }
                 wheelCreateSegments()
                 setupWheel()
             }
 
-            const resultSort = () => {
-                let numbers = wheelResults.filter((item: IResult) => typeof item.text === "number")
-                let strings = wheelResults.filter((item: IResult) => typeof item.text === "string")
-
-                if (target.classList.contains('sorted')) {
-                    numbers.sort((a: IResult, b: IResult) => <number>b.text - <number>a.text)
-                    strings.sort((a: IResult, b: IResult) => <string>a.text > <string>b.text ? -1 : 1)
-                    wheelResults = numbers.concat(strings)
-                    target.classList.remove('sorted')
-                } else {
-                    numbers.sort((a: IResult, b: IResult) => <number>a.text - <number>b.text)
-                    strings.sort((a: IResult, b: IResult) => <string>a.text < <string>b.text ? -1 : 1)
-                    wheelResults = numbers.concat(strings)
-                    target.classList.add('sorted')
-                }
-
-                addSelectResult()
-            }
-
-            selectedTabResult ? resultSort() : sort()
+            sort()
         })
 
         wheelTrash.addEventListener('click', (): void => {
@@ -273,6 +313,53 @@ const appWheel = (): void => {
                 wheelSegmentCounter()
                 wheelCreateSegments()
                 setupWheel()
+            }
+        })
+
+        wheelSortResult.addEventListener('click', (): void => {
+            const sort = () => {
+                let numbers = wheelResults.filter((item: IResult) => typeof item.text === "number")
+                let strings = wheelResults.filter((item: IResult) => typeof item.text === "string")
+
+                if (wheelSortResult.classList.contains('sorted')) {
+                    numbers.sort((a: IResult, b: IResult) => <number>b.text - <number>a.text)
+                    strings.sort((a: IResult, b: IResult) => <string>a.text > <string>b.text ? -1 : 1)
+                    wheelResults = numbers.concat(strings)
+                    wheelSortResult.classList.remove('sorted')
+                } else {
+                    numbers.sort((a: IResult, b: IResult) => <number>a.text - <number>b.text)
+                    strings.sort((a: IResult, b: IResult) => <string>a.text < <string>b.text ? -1 : 1)
+                    wheelResults = numbers.concat(strings)
+                    wheelSortResult.classList.add('sorted')
+                }
+                addSelectResult()
+            }
+            sort()
+        })
+
+        wheelCurListResult.addEventListener('click', (): void => {
+            wheelResults.sort((a: IResult, b: IResult) => a.date - b.date)
+            addSelectResult()
+        })
+
+        wheelTrashResult.addEventListener('click', (): void => {
+            wheelResults.length = 0
+            addSelectResult()
+        })
+
+        wheelSortIncResult.addEventListener('click', (): void => {
+            let isInc = wheelResults.filter(result => result.inc)
+            let noInc = wheelResults.filter(result => !result.inc)
+            if (wheelSortIncResult.classList.contains('sorted')) {
+                isInc.sort((a: IResult, b: IResult) => a.value - b.value)
+                wheelResults = isInc.concat(noInc)
+                addSelectResult()
+                wheelSortIncResult.classList.remove('sorted')
+            } else {
+                isInc.sort((a: IResult, b: IResult) => b.value - a.value)
+                wheelResults = isInc.concat(noInc)
+                addSelectResult()
+                wheelSortIncResult.classList.add('sorted')
             }
         })
     }
@@ -313,7 +400,13 @@ const appWheel = (): void => {
         wheelSegmentItems = wheelEntries.querySelectorAll('.side__item')!
 
         function editAmount(this: HTMLInputElement) {
+            this.value = this.value.replace(/[^\d]/g, '')
+            if (!(parseInt(this.value) >= 1 && parseInt(this.value) <= 50)) {
+                parseInt(this.value) < 1 ? this.value = '1' : null
+                parseInt(this.value) > 50 ? this.value = '50' : null
+            }
             const segmentAmount = parseInt(this.value)
+
             if (segmentAmount && segmentAmount > 0 && segmentAmount < 51) {
                 wheelSegments.find(segment => segment.id === this.name && !segment.copy)!.amount = parseInt(this.value)
                 wheelSegmentCounter()
@@ -422,11 +515,16 @@ const appWheel = (): void => {
 
         btn.addEventListener('click', addSegment)
         headInput.addEventListener('keyup', keyUpAdd)
-
+        headAmount.addEventListener('input', function (this: HTMLInputElement) {
+            this.value = this.value.replace(/[^\d]/g, '')
+            if (!(parseInt(this.value) >= 1 && parseInt(this.value) <= 50)) {
+                parseInt(this.value) < 1 ? this.value = '1' : null
+                parseInt(this.value) > 50 ? this.value = '50' : null
+            }
+        })
     }
 
     const wheelSegmentCounter = (): void => {
-
         wheelCheckAmount()
         const wheelShuffle = document.querySelector<HTMLButtonElement>('#wheelShuffle')!,
             wheelSort = document.querySelector<HTMLButtonElement>('#wheelSort')!,
@@ -435,12 +533,18 @@ const appWheel = (): void => {
         const lockBtn = (): void => {
             wheelShuffle.disabled = true
             wheelSort.disabled = true
-            wheelTrash.disabled = true
         }
         const unlockBtn = (): void => {
             wheelShuffle.disabled = false
             wheelSort.disabled = false
-            wheelTrash.disabled = false
+        }
+
+        const btnLockFn = (): void => {
+            if (wheelSegments.length > 1) {
+                unlockBtn()
+            } else {
+                lockBtn()
+            }
         }
         let counterSegment
         let counter = document.querySelector<HTMLDivElement>('.side__entries_counter')!
@@ -451,15 +555,17 @@ const appWheel = (): void => {
             counterSegment = wheelSegments.filter(segment => !segment.hide && !segment.copy)
         }
 
-
         counter.innerHTML = counterSegment.length.toString()
         if (counterSegment.length) {
             counter.style.display = "flex"
-            unlockBtn()
+            wheelTrash.disabled = false
         } else {
             counter.style.display = "none"
-            lockBtn()
+            wheelTrash.disabled = true
         }
+
+        btnLockFn()
+
         wheelAddColors()
         wheelCheckCountSegments()
     }
@@ -487,6 +593,8 @@ const appWheel = (): void => {
             if (length > 40) {
                 wheelList.className = `wheel__list ${xs}`
             }
+        } else {
+            wheelList.className = `wheel__list ${xl}`
         }
     }
 
@@ -521,11 +629,27 @@ const appWheel = (): void => {
 
     const wheelResultCounter = (): void => {
         let resultsCounter = document.querySelector<HTMLDivElement>('.side__counter')!
+        const wheelSortResult = document.querySelector<HTMLButtonElement>('#wheelSortResult')!,
+            wheelCurListResult = document.querySelector<HTMLButtonElement>('#wheelCurListResult')!,
+            wheelTrashResult = document.querySelector<HTMLButtonElement>('#wheelTrashResult')!,
+            wheelSortIncResult = document.querySelector<HTMLButtonElement>('#wheelSortIncResult')!
         if (wheelResults.length) {
             resultsCounter.style.display = "flex"
             resultsCounter.innerHTML = wheelResults.length.toString()
+            wheelTrashResult.disabled = false
         } else {
             resultsCounter.style.display = "none"
+            wheelTrashResult.disabled = true
+        }
+
+        if (wheelResults.length >= 2) {
+            wheelSortResult.disabled = false
+            wheelCurListResult.disabled = false
+            wheelSortIncResult.disabled = false
+        } else {
+            wheelSortResult.disabled = true
+            wheelCurListResult.disabled = true
+            wheelSortIncResult.disabled = true
         }
         updateLocalResult()
     }
@@ -574,8 +698,7 @@ const appWheel = (): void => {
                 if (check) {
                     wheelResults = [...wheelResults, result]
                 }
-            }
-            else {
+            } else {
                 wheelResults = [...wheelResults, result]
             }
         }
@@ -611,38 +734,22 @@ const appWheel = (): void => {
         const modal = document.querySelector<HTMLDivElement>('#wheelModal')!
         const modalCloseButton = document.querySelectorAll<HTMLButtonElement>('.wheel-modal_close')!
         const modalAddBtn = document.querySelector<HTMLButtonElement>('.wheel-modal__button_add')!
-        let modalInput = document.querySelector<HTMLElement>('.wheel-modal__input')!
-        let modalInputEdit = document.querySelector<HTMLElement>('.wheel-modal__input-editable')!
-        let modalInputReadonly = document.querySelector<HTMLElement>('.wheel-modal__input-readonly')
-        let arr: ISegment[] = [...wheelSegments]
+        let modalInputEdit = document.querySelector<HTMLInputElement>('.wheel-modal__input-editable')!
+
+        modalInputEdit.value = ''
 
         modalOpen(modal)
+        const wheelCreateHTML = (item: any) => {
+            return `${item}\n`
+        }
 
         if (wheelSegments.length > 0) {
-            if (modalInputReadonly === null) {
-                const div = document.createElement('div')
-                div.className = 'wheel-modal__input-readonly'
-                div.innerHTML = ''
-                wheelSegments.map(item => {
-                    div.innerHTML += wheelCreateHTML(item)
-                })
-                modalInput.insertBefore(div, modalInputEdit)
-                const inputs = div.querySelectorAll<HTMLInputElement>('.wheel-modal__input_item')
-
-                function newTextSegment(segment: ISegment, input: HTMLInputElement) {
-                    segment.text = input.value
-                    modalAddBtn.removeEventListener('click', newTextSegment.bind)
+            wheelSegments.map(item => {
+                if (!item.copy) {
+                    const str = String(item.text)
+                    modalInputEdit.value += wheelCreateHTML(str)
                 }
-
-                inputs.forEach(input => {
-                    arr.map(segment => {
-                        if (segment.id === input.id) {
-                            input.addEventListener('input', newTextSegment.bind(null, segment, input))
-                        }
-                    })
-
-                })
-            }
+            })
         }
 
         if (modalCloseButton.length > 0) {
@@ -651,44 +758,37 @@ const appWheel = (): void => {
             })
         }
 
-        function wheelCreateHTML(item: any): string {
-            return `
-            <input class="wheel-modal__input_item" id="${item.id}" type="text" value="${item.text}"/> 
-        `
-        }
-
-        function addElements() {
-            modalInputEdit.childNodes.forEach(item => {
-                if (item.textContent) {
-                    if (parseInt(item.textContent)) {
-                        const number = parseInt(item.textContent)
-                        wheelSegments = [...wheelSegments, {
-                            id: uniqueId(),
-                            amount: 1,
-                            text: number,
-                            hide: false,
-                            copy: false
-                        }]
-                    }
-                    else {
-                        const string = item.textContent
-                        wheelSegments = [...wheelSegments, {
-                            id: uniqueId(),
-                            amount: 1,
-                            text: string,
-                            hide: false,
-                            copy: false
-                        }]
-                    }
+        const addSegment = (): void => {
+            let segments = modalInputEdit.value.split('\n').filter(segment => segment !== '')
+            wheelSegments.length = 0
+            segments.map(segment => {
+                if (parseInt(segment)) {
+                    const number: number = parseInt(segment)
+                    wheelSegments = [...wheelSegments, {
+                        id: uniqueId(),
+                        amount: 1,
+                        text: number,
+                        hide: false,
+                        copy: false
+                    }]
+                } else {
+                    const string: string = segment
+                    wheelSegments = [...wheelSegments, {
+                        id: uniqueId(),
+                        amount: 1,
+                        text: string,
+                        hide: false,
+                        copy: false
+                    }]
                 }
             })
-            modalInputEdit.innerHTML = ""
+            wheelSegmentCounter()
             wheelCreateSegments()
             setupWheel()
-            modalAddBtn.removeEventListener('click', addElements)
+            modalAddBtn.removeEventListener('click', addSegment)
         }
 
-        modalAddBtn.addEventListener('click', addElements)
+        modalAddBtn.addEventListener('click', addSegment)
     }
 
     const winModal = (win: ISegment, selected: number, winText: string | number): void => {
@@ -699,6 +799,8 @@ const appWheel = (): void => {
             btnRemove = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_remove')!,
             btnHide = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_hide')!,
             btnInc = modal.querySelector<HTMLButtonElement>('.wheel-modal__button_inc')!
+
+        winMusic()
 
         modalOpen(modal)
 
@@ -713,11 +815,13 @@ const appWheel = (): void => {
         }
 
         function addHandler() {
+
             const result: IResult = {
                 id: win.id,
                 text: winText,
                 value: 1,
-                inc: false
+                inc: false,
+                date: Date.now()
             }
 
             addSelectResult(result)
@@ -729,11 +833,13 @@ const appWheel = (): void => {
                 id: win.id,
                 text: winText,
                 value: 1,
-                inc: false
+                inc: false,
+                date: Date.now()
             }
             addSelectResult(result)
             wheelSegments.filter(segment => segment.id === win.id).map(segment => segment.hide = true)
             wheelCreateSegments()
+            wheelSegmentCounter()
             setupWheel()
             removeListener()
         }
@@ -743,11 +849,13 @@ const appWheel = (): void => {
                 id: win.id,
                 text: winText,
                 value: 1,
-                inc: false
+                inc: false,
+                date: Date.now()
             }
             addSelectResult(result)
             wheelSegments = wheelSegments.filter(segment => !(segment.id === win.id))
             wheelCreateSegments()
+            wheelSegmentCounter()
             setupWheel()
             removeListener()
         }
@@ -757,7 +865,8 @@ const appWheel = (): void => {
                 id: win.id,
                 text: winText,
                 value: 1,
-                inc: true
+                inc: true,
+                date: Date.now()
             }
             addSelectResult(result)
             removeListener()
@@ -807,6 +916,8 @@ const appWheel = (): void => {
                     colors.push(...curColors)
                     --length
                 }
+            } else if (wheelSegments.length <= 16) {
+                colors = [...curColors]
             }
         }
     }
@@ -841,13 +952,21 @@ const appWheel = (): void => {
         if (parseInt(text)) {
             text = parseInt(text)
         }
-
         prizeNodes[selected].classList.add(selectedClass)
-        winModal(
-            notHide[selected],
-            selected,
-            text
-        )
+        if (!notHide.length) {
+            winModal(
+                plug[selected],
+                selected,
+                text
+            )
+        } else {
+            winModal(
+                notHide[selected],
+                selected,
+                text
+            )
+        }
+
     }
 
     const setupWheel = (): void => {
@@ -864,11 +983,43 @@ const appWheel = (): void => {
                 segmentSlice = 360 / segmentNotHide.length;
             }
         }
+
+        wheelAddColors()
         wheelCreateSegmentsColor()
         wheelCreateSegmentsNodes()
         updateLocalSegment()
 
         prizeNodes = wheel.querySelectorAll('.wheel__item')
+    }
+
+    const runTickerMusic = () => {
+        const wheelListStyles = window.getComputedStyle(wheelList)
+        const values = wheelListStyles.transform.split("(")[1].split(")")[0].split(",");
+        const a = values[0];
+        const b = values[1];
+        let prizeSlice
+        let rad = Math.atan2(Number(b), Number(a))
+        rad < 0? rad += (1.5 * Math.PI): null
+        if (notHide.length) {
+            prizeSlice = 360 / notHide.length
+        } else {
+            prizeSlice = 360 / plug.length
+        }
+
+        const angle = Math.floor(rad * (180 / Math.PI))
+
+        const slice = Math.floor(angle / prizeSlice)
+
+        if (currentSlice !== slice) {
+
+            tickMusic()
+
+            currentSlice = slice;
+        }
+
+        console.log(slice)
+
+        tickerMusic = requestAnimationFrame(runTickerMusic);
     }
 
 // отслеживаем нажатие на кнопку
@@ -878,12 +1029,14 @@ const appWheel = (): void => {
         const inputs = side.querySelectorAll<HTMLInputElement>('input')!
         const buttons = side.querySelectorAll<HTMLButtonElement>('button')!
 
+        buttonMusic()
+
         inputs.forEach(input => {
             input.readOnly = true
         })
 
         buttons.forEach(btn => {
-            wheelDisabledBtn(btn)
+            btn.disabled = true
         })
         // делаем её недоступной для нажатия
         wheelDisabledBtn(trigger)
@@ -895,6 +1048,8 @@ const appWheel = (): void => {
         wheel.classList.add(spinClass)
         // через CSS говорим секторам, как им повернуться
         wheelList.style.setProperty("--rotate", rotation.toString())
+
+        runTickerMusic()
     })
 
 // отслеживаем остановку колеса
@@ -918,7 +1073,7 @@ const appWheel = (): void => {
         })
 
         buttons.forEach(btn => {
-            wheelDisabledBtn(btn)
+            btn.disabled = false
         })
     })
 
@@ -926,6 +1081,41 @@ const appWheel = (): void => {
     wheelCheckboxAmount.addEventListener('click', () => {
         IS_AMOUNT = !IS_AMOUNT
         setupSide(IS_AMOUNT)
+        updateLocalAmount()
+    })
+
+    hideAllBtn.addEventListener('click', () => {
+        if (hideAllBtn.classList.contains('hidden')) {
+            hideAllBtn.children[0].className = 'fas fa-eye-slash fa-lg'
+            hideAllBtn.classList.remove("hidden")
+            wheelSegments.map(item => item.hide = false)
+        } else {
+            hideAllBtn.children[0].className = 'fas fa-eye fa-lg'
+            hideAllBtn.classList.add("hidden")
+            wheelSegments.map(item => item.hide = true)
+        }
+
+        wheelCheckAmount()
+        wheelSegmentCounter()
+        wheelCreateSegments()
+        setupWheel()
+    })
+
+    resetIncAllBtn.addEventListener('click', () => {
+        wheelResults.filter(result => result.inc).map(result => result.value = 1)
+        addSelectResult()
+    })
+
+    wheelModalRemoveBtn.addEventListener('click', () => {
+        const modal = document.querySelector('#wheelModalWin')!
+        const icon = wheelModalRemoveBtn.children[0]
+        if (modal.classList.contains('wheel-modal_remove-active')) {
+            icon.className = 'fas fa-minus-circle'
+            modal.classList.remove('wheel-modal_remove-active')
+        } else {
+            icon.className = 'fas fa-plus-circle'
+            modal.classList.add('wheel-modal_remove-active')
+        }
     })
 
 //=============start==============

@@ -45,19 +45,42 @@
                     </div>
                 </div>
                 <div class="side__icons">
-                    <button id="wheelList">
+                    <button class="side__icons_btn side__icons_entries" id="wheelList">
                         <i class="fas fa-list fa-lg"></i>
                     </button>
-                    <button id="wheelShuffle">
+                    <button class="side__icons_btn side__icons_entries" id="wheelShuffle">
                         <i class="fas fa-random fa-lg"></i>
                     </button>
-                    <button id="wheelSort">
+                    <button class="side__icons_btn side__icons_entries" id="wheelSort">
                         <i class="fas fa-sort"></i>
                     </button>
-                    <button id="wheelTrash">
+                    <button class="side__icons_btn side__icons_entries" id="wheelTrash">
+                        <i class="fas fa-trash-alt fa-lg"></i>
+                    </button>
+                    <button class="side__icons_btn side__icons_result" id="wheelCurListResult">
+                        <i class="fas fa-clipboard-list"></i>
+                    </button>
+                    <button class="side__icons_btn side__icons_result" id="wheelSortIncResult">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                    <button class="side__icons_btn side__icons_result" id="wheelSortResult">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                    <button class="side__icons_btn side__icons_result" id="wheelTrashResult">
                         <i class="fas fa-trash-alt fa-lg"></i>
                     </button>
                 </div>
+            </div>
+            <div class="side__main-btn">
+                <button id="wheelHideAll">
+                    <i class="fas fa-eye-slash fa-lg"></i>
+                </button>
+                <button id="wheelResetIncAll">
+                    <i class="fas fa-trash-restore-alt"></i>
+                </button>
+                <button id="wheelRemoveBtn">
+                    <i class="fas fa-minus-circle"></i>
+                </button>
             </div>
             <div class="side__field">
                 <div class="side__head">
@@ -75,8 +98,7 @@
             <div class="wheel-modal__body">
                 <div class="wheel-modal__content">
                     <div class="wheel-modal__input">
-                        <div class="wheel-modal__input-editable" aria-placeholder="Введите/Вставьте свои новые поля"
-                             contenteditable="true"></div>
+                        <textarea class="wheel-modal__input-editable" aria-placeholder="Введите/Вставьте свои новые поля"></textarea>
                     </div>
                     <div class="wheel-modal__buttons">
                         <button class="wheel-modal__button wheel-modal__button_cansel wheel-modal_close">Отмена</button>
@@ -85,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div id="wheelModalWin" class="app__wheel-modal wheel-modal">
+        <div id="wheelModalWin" class="app__wheel-modal wheel-modal ">
             <div class="wheel-modal__body">
                 <div class="wheel-modal__content">
                     <div class="wheel-modal__win">
@@ -104,7 +126,10 @@
             <label for="wheelCheckBox">Включить счетчик?</label>
             <input id="wheelCheckBox" type="checkbox" checked>
         </div>
+        <audio id="wheelMusicButton"><source src="./Button.mp3" type="audio/mp3"></audio>
+        <audio id="wheelMusicWin"><source src="./win.mp3" type="audio/mp3"></audio><audio id="wheelMusicTick"><source src="./Tick.mp3" type="audio/mp3"></audio>
     </div>
+
 </div>
 </body>
 </html>

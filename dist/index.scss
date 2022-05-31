@@ -35,9 +35,10 @@ button {
 
 .wheel {
   position: relative;
-  --size: clamp(250px, 40vmin, 700px);
   --lg-hs: 0 3%;
   --lg-stop: 50%;
+  width: 520px;
+  height: 520px;
   display: grid;
   grid-gap: calc(var(--size) / 20);
   align-items: center;
@@ -45,8 +46,18 @@ button {
     "spinner"
     "trigger";
   @media (max-width: 992px) {
-    justify-content: center;
+    margin: auto;
   }
+  @media (max-width: 550px) {
+    width: 25em;
+    height: 25em;
+  }
+
+  @media (max-width: 420px) {
+    width: 19em;
+    height: 19em;
+  }
+
 
   &.is-spinning {
     .wheel__list {
@@ -81,8 +92,8 @@ button {
     /* выравниваем всё по центру */
     align-items: center;
     /* устанавливаем размеры */
-    width: 32em;
-    height: 32em;
+    width: 520px;
+    height: 520px;
     background-color: #ccc;
     /* поворачиваем элемент  */
     transform: rotate(calc(var(--rotate, 25) * 1deg));
@@ -107,7 +118,7 @@ button {
       position: absolute;
       align-items: center;
       /* задаём отступы от краёв блока */
-      padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 20);
+      padding: 0 20px;
       /* устанавливаем размеры */
       height: 50%;
       width: 100%;
@@ -119,6 +130,10 @@ button {
       /* запрещаем пользователю выделять мышкой текст на секторах */
       min-width: 0;
       font-size: 24px;
+      
+      @media (max-width: 420px) {
+        padding: 0 10px;
+      }
 
       &_text {
         display: inline-block;
@@ -188,8 +203,8 @@ button {
 
   &__border {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 520px;
+    height: 520px;
     border: 15px solid rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     z-index: 20;
@@ -260,7 +275,6 @@ button {
     width: 400px;
     padding: 0 10px;
   }
-  
   @media (max-width: 420px) {
     width: 310px;
   }
@@ -312,6 +326,18 @@ button {
       &_active {
         color: #5e5e5e !important;
       }
+    }
+  }
+  .side__icons_result {
+    display: none;
+  }
+
+  &__main-btn {
+    button {
+      background-color: transparent;
+      font-size: 20px;
+      border: none;
+      margin-bottom: 20px;
     }
   }
 
@@ -485,9 +511,17 @@ button {
   }
 
   &.side_result {
-
+    .side__icons_entries {
+      display: none;
+    }
+    .side__icons_result {
+      display: block;
+    }
     .side__icons {
       button[id="wheelShuffle"] {
+        display: none;
+      }
+      button[id="wheelList"] {
         display: none;
       }
     }
@@ -624,10 +658,11 @@ button {
     margin-bottom: 2rem;
 
     &-editable {
-      flex: 1 0 20rem;
       outline: none;
       cursor: text;
       height: 100%;
+      border: none;
+      width: 100%;
 
       &:empty:before {
         content: attr(aria-placeholder);
@@ -743,6 +778,21 @@ button {
         grid-template-rows: 1fr 1fr 1fr 1fr;
         grid-template-columns: 1fr;
         gap: 10px;
+      }
+    }
+
+    &.wheel-modal_remove-active {
+      .wheel-modal__button_remove {
+        display: none;
+      }
+      .wheel-modal__buttons {
+        grid-template-columns: 1fr 1fr 1fr;
+
+        @media (max-width: 600px) {
+          grid-template-rows: 1fr 1fr 1fr;
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
       }
     }
   }
